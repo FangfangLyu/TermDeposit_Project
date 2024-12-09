@@ -11,9 +11,9 @@ The  code in markdown format.
 
 | Component   | Sub-Task     | Status          | Test Result | Completion |
 |-------------|--------------|-----------------|-------------|------------|
-| Component 1 | sub-task 1   | 🔴 Not Started  | -           | 0%         |
+| Tree Class  | sub-task 1   | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2   | 🔴 Not Started  | -           | 0%         |
-| Component 2 | sub-task 1   | 🔴 Not Started  | -           | 0%         |
+| Data Manger | sub-task 1   | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2   | 🔴 Not Started  | -           | 0%         |
 
 ---
@@ -23,9 +23,9 @@ The  code in markdown format.
 
 | Component   | Sub-Task     | Status          | Test Result | Completion |
 |-------------|--------------|-----------------|-------------|------------|
-| Component 1 | sub-task 1   | 🔴 Not Started  | -           | 0%         |
+| Additional  | sub-task 1   | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2   | 🔴 Not Started  | -           | 0%         |
-| Component 2 | sub-task 1   | 🔴 Not Started  | -           | 0%         |
+| UI(team too) | sub-task 1   | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2   | 🔴 Not Started  | -           | 0%         |
 
 ---
