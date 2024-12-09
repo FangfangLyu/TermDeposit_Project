@@ -1,5 +1,3 @@
-import com.termdeposit.DataContainer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,13 +5,16 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
+import com.termdeposit.model.DataContainer;
+
+
 public class Main {
 
     public static void main(String[] args) {
         HashMap<String, String> dataTypeMap = new HashMap<>();
 
         // Populating the map with column names and their corresponding data types
-        dataTypeMap.put("ID", "Integer");           
+        dataTypeMap.put("ID", "String");           
         dataTypeMap.put("age", "Integer");         // Age is a numerical value
         dataTypeMap.put("job", "String");          // Job is a categorical feature (String)
         dataTypeMap.put("marital", "String");      // Marital status is a categorical feature (String)
@@ -40,12 +41,13 @@ public class Main {
         try{
             knn.train();
             knn.saveModel("knn.bin");
+            knn.imputeMissingValues();
         }catch(Exception e){
             System.out.println("Knn failed.");
             e.printStackTrace(); // Prints the exception and the call stack
-
         }
         
+
         //System.out.println(data.gettrainingDataWithMissing());
 
 

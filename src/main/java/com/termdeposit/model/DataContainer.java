@@ -1,4 +1,4 @@
-package com.termdeposit;
+package com.termdeposit.model;
 
 
 import java.util.*;
@@ -8,10 +8,13 @@ import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk; //this IBk package from weka contains KNN method
 import weka.core.Attribute;
 import weka.core.DenseInstance;
+import weka.core.DistanceFunction;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 // import weka.knowledgeflow.steps.DataCollector;
+import weka.core.neighboursearch.LinearNNSearch;
+import weka.core.neighboursearch.NearestNeighbourSearch;
 
 
 public class DataContainer {
@@ -23,7 +26,9 @@ public class DataContainer {
 
     // Note: Array is an interface, can not be instantiated, but it can store ArrayList later.
     private List<HashMap<String,Object>> trainingData;
+
     private List<HashMap<String,Object>> trainingDataWithMissing; //TODO: NEW
+
     private List<HashMap<String,Object>> testingData;
     
     private HashMap<String,Object> predictionInput; 
@@ -91,7 +96,9 @@ public class DataContainer {
                 String line;
                 // Read each line and add it to the list
                 while ((line = reader.readLine()) != null) {
-                    lines.add(line);
+                    if (!line.trim().isEmpty()) {
+                        lines.add(line);
+                    }
                 }
             } catch (IOException e) {
                 System.err.println("Error reading file: " + e.getMessage());
@@ -219,16 +226,19 @@ public class DataContainer {
 
     //nested inner class (non-static nested class)        
     public class KNN {
-        private IBk knn;
+        private NearestNeighbourSearch m_NNSearch; //for KNN
         private Instances trainingInstances;
-        private int numberNeighbors;
+        private Instances trainingMissingInstances;
+        private HashMap<String, String> featureList;
+
+        private ArrayList<Attribute> attributes;
+
+        private Set<String> usedIds;
+
         private String modelFilename;
 
-
         public KNN() {
-            this.numberNeighbors = 3; //defualt k set to 3
-            this.knn = new IBk(numberNeighbors); 
-            //TODO: Do I need to instantiate the Instances here?
+
         }
 
         public void oneHotkeyEncoding(List<HashMap<String, Object>> data){
@@ -246,7 +256,11 @@ public class DataContainer {
                         LinkedHashSet<String> uniqueValues = DataContainer.this.oneHotkeyValues.get(feature); 
                         for (String uniqueValue : uniqueValues) {
                             String newFeatureName = feature + "_" + uniqueValue;
-                            transformedRow.put(newFeatureName, uniqueValue.equals(value) ? 1.0 : 0.0);
+                            if(value != null){
+                                transformedRow.put(newFeatureName, uniqueValue.equals(value) ? 1.0 : 0.0);
+                            }else{
+                                transformedRow.put(newFeatureName, null);
+                            }
                         }
                     } else {
                         // Retain non-categorical features
@@ -261,107 +275,198 @@ public class DataContainer {
             data.addAll(updatedTrainingData);  // Add all transformed rows to the original list
         }
 
+        public Instance toInstance(HashMap<String, Object> row, Instances destInstances){
+            // Add complete data instances to Weka Instances object
+            Instance instance = new DenseInstance(this.attributes.size()); 
+            /**
+             * Instance object in Weka represents a single data point. 
+             * DenseInstance (vs SpareInstance) is subclass of Instance where all attributes are defined, no missing
+             */
+            instance.setDataset(destInstances); //set up empty instance with correct number of attributes without ID and y.
+
+            for (int j = 0; j < this.attributes.size(); j++) {
+                String feature = this.attributes.get(j).name(); //get the attribute name
+                Object value = row.get(feature); //get the value under the attribute(feature)
+                
+                if (!feature.equals("class") && value != null) {
+                    instance.setValue(j, ((Number) value).doubleValue()); 
+                    //get the value under each attributes (Now, all attributes are numeric after encoding)
+                    //.doubleValue (case Number type to Double type for Weka)
+                } else {
+                    if(feature.equals("class")){
+                        instance.setValue(j, 0.0);  // Set the dummy class value for all instances, no meaning for itself, but all instances share it.
+                    }else{
+                        System.err.println("Missing data from preprocess training data set." + feature + "\n");
+                        // Handle missing data if any, this should not error in our program design
+                        instance.setMissing(j);
+                    }
+                }
+            }
+
+            // Add dummy class value (constant 'dummy' class)
+            // Storing the instance object into Instances object 
+            destInstances.add(instance);            
+            return instance;
+            
+
+        }
+
         public void train() throws Exception {
             oneHotkeyEncoding(DataContainer.this.trainingData);
 
             // Build Weka attributes
-            ArrayList<Attribute> attributes = new ArrayList<>();
+            this.attributes = new ArrayList<>();
             
-            HashMap<String, String> featureList = DataContainer.this.featureDatatype;
-            featureList.remove("id");
-            featureList.remove("y");
+            this.featureList = DataContainer.this.featureDatatype;
+            this.featureList.remove("ID");
+            this.featureList.remove("y");
             // id and y plays no role in KNN, and it should not interfere the KNN, thus remove them from the attribute list.
-
+            
             // Iterate through features to construct Weka attributes(after the one hot key)
-            for (String feature : featureList.keySet()) {
-                if ("String".equals(featureList.get(feature))) {
+            for (String feature : this.featureList.keySet()) {
+                if ("String".equals(this.featureList.get(feature))) {
                     //handle categorical
                     for (String uniqueValue : DataContainer.this.oneHotkeyValues.get(feature)) {
-                        attributes.add(new Attribute(feature + "_" + uniqueValue)); //because after one hot encoding, the categorical attributes get expanded.
+                        this.attributes.add(new Attribute(feature + "_" + uniqueValue)); //because after one hot encoding, the categorical attributes get expanded.
                     }
-                } else if ("Integer".equals(featureList.get(feature)) || "Float".equals(featureList.get(feature))) {
+                } else if ("Integer".equals(this.featureList.get(feature)) || "Float".equals(this.featureList.get(feature))) {
                     //handle numeric features
-                    attributes.add(new Attribute(feature));
+                    this.attributes.add(new Attribute(feature));
                 }
             }
 
-            attributes.add(new Attribute("class")); // Add dummy class attribute
-
-
+            //this.attributes.add(new Attribute("class")); // Add dummy class attribute
             
             // Create the Weka Instances object for KNN imputation, where features 
-            this.trainingInstances = new Instances("TrainingData", attributes, DataContainer.this.trainingData.size());
+            this.trainingInstances = new Instances("TrainingData", this.attributes, DataContainer.this.trainingData.size());
             
             // Add complete data instances to Weka Instances object
             for (HashMap<String, Object> row : DataContainer.this.trainingData) {
-                Instance instance = new DenseInstance(attributes.size()); 
-                /**
-                 * Instance object in Weka represents a single data point. 
-                 * DenseInstance (vs SpareInstance) is subclass of Instance where all attributes are defined, no missing
-                 */
-                instance.setDataset(this.trainingInstances);
-
-                for (int j = 0; j < attributes.size(); j++) {
-                    String feature = attributes.get(j).name(); //get the attribute name
-                    Object value = row.get(feature); //get the value under the attribute(feature)
-                    
-                    if (!feature.equals("class") && value != null) {
-                        instance.setValue(j, ((Number) value).doubleValue()); 
-                        //get the value under each attributes (Now, all attributes are numeric after encoding)
-                        //.doubleValue (case Number type to Double type for Weka)
-                    } else {
-                        if(feature.equals("class")){
-                            instance.setValue(j, 0.0);  // Set the dummy class value for all instances
-                        }else{
-                            System.err.println("Missing data from preprocess training data set." + feature + "\n");
-                            // Handle missing data if any, this should not error in our program design
-                            instance.setMissing(j);
-                        }
-                    }
-                }
-
-                // Add dummy class value (constant 'dummy' class)
-                // Storing the instance object into Instances object 
-                this.trainingInstances.add(instance);
+                toInstance(row, this.trainingInstances);
             }
 
-
-            // Set the class index to the dummy class
-            this.trainingInstances.setClassIndex(attributes.size() - 1);
-
-            // Train the model knn (IBk object in Weka) using the Instances object
-            knn.buildClassifier(this.trainingInstances);
-            System.out.println("KNN model has been trained.");
-            //saveModel();
-
             
+            this.m_NNSearch = new LinearNNSearch(this.trainingInstances);
+            System.out.println("KNN model has been trained." );
+            //saveModel();
         }
 
         public void saveModel(String modelFilename) throws Exception {
             // Save the trained KNN model to the specified file
-            SerializationHelper.write(modelFilename, knn);
+            SerializationHelper.write(modelFilename, this.m_NNSearch);
             this.modelFilename = modelFilename;
             System.out.println("Model saved to: " + modelFilename);
         }
 
-
-        public void findNeighbors(Instance instanceToClassify) throws Exception {
-
-            Classifier classifier = (Classifier) SerializationHelper.read(modelFilename);
-
-
-            // Get the neighbors for the given instance
-            double[] distances = knn.getDistances(instanceToClassify);  // This returns the distances to the neighbors
-
-            System.out.println("Neighbors for instance " + instanceToClassify);
-            for (int i = 0; i < distances.length; i++) {
-                // For each neighbor, you can also output the index and distance
-                System.out.println("Neighbor " + i + ": " + "Distance = " + distances[i]);
+        // Helper method to find the index of the maximum value in an array
+        private int getIndex(double[] array) {
+            int maxIndex = 0;
+            for (int i = 1; i < array.length; i++) {
+                if (array[i] < array[maxIndex]) {
+                    maxIndex = i;
+                }
             }
+            System.out.println("Neighbor index at "+ maxIndex);
+            return maxIndex;
         }
 
+        private String findUnusedId() {
+            this.usedIds = new HashSet<>();
+        
+            // Collect all the used IDs from your training data
+            for (int i = 0; i < trainingInstances.numInstances(); i++) {
+                this.usedIds.add(trainingInstances.instance(i).stringValue(trainingInstances.attribute("ID")));
+            }
+        
+            // Find an ID that is not in the used IDs set
+            String newId = "newID"; // Replace with the logic to generate a new unused ID
+            while (usedIds.contains(newId)) {
+                newId = generateNewId();  // You can implement this method to generate unique IDs
+            }
+            return newId;
+        }
 
+        private String generateNewId() {
+            // Example: Create a new ID by appending a number or UUID
+            return "id_" + System.currentTimeMillis();
+        }
+
+        // Perform KNN imputation for missing values in the dataset
+        public void imputeMissingValues() throws Exception {
+
+            //System.out.println(DataContainer.this.trainingDataWithMissing.toString());
+            
+
+            this.oneHotkeyEncoding(DataContainer.this.trainingDataWithMissing);
+            // Create the Weka Instances object for KNN imputation, where features 
+            this.trainingMissingInstances = new Instances("TrainingDataMissing", this.attributes, DataContainer.this.trainingDataWithMissing.size());
+            
+            // Add complete data instances to Weka Instances object
+            for (HashMap<String, Object> row : DataContainer.this.trainingDataWithMissing) {
+                toInstance(row, this.trainingMissingInstances);
+                //System.out.println(this.trainingMissingInstances.toString());
+            }
+
+            for (int i = 0; i < this.trainingMissingInstances.numInstances(); i++) {
+                Instance instance = this.trainingMissingInstances.instance(i);
+
+                // Check if the instance has missing values
+                if (instance.hasMissingValue()) {
+                    Instances neighbours = this.m_NNSearch.kNearestNeighbours(instance, 1); //get nearest the neighbors
+                    double [] distances = this.m_NNSearch.getDistances();
+                    System.out.println(neighbours.size());
+
+                    /* 
+                    int counter = 0; // Initialize the counter
+                    for(Instance neighbor : neighbours){
+                        System.out.println("Nearest neighbor: ");
+                        System.out.println(neighbor.toString() + " & " + distances[counter]);
+                        counter++;
+                    }*/
+
+
+                    int maxIndex = getIndex(distances);  // Find the class with the highest probability => this step is not necessary if we get one nearest neighbor, but if all neighbors have the same distance, there are many
+                    System.out.println("Closet Neighbor" + this.trainingInstances.get(maxIndex));
+
+                    System.out.println("**has Missing.");
+                    // Iterate over all attributes
+                    for (int j = 0; j < instance.numAttributes(); j++) {
+                        if(instance.isMissing(j)) { //TODO: IF ID IS MISSING, I WOULD PICK another not used ID.
+                            String featureName = instance.attribute(j).name();
+                            // Handle missing "ID" separately
+                            if ("ID".equals(featureName)) {
+                                // Find another unused ID from the dataset
+                                String newId = findUnusedId();
+                                instance.setValue(j, newId);  // Set the missing ID to a new unique value
+                            }else{
+                                double predicted = neighbours.get(maxIndex).value( instance.attribute(j) );
+                                System.out.println("The missing feature " + featureName + " is imputed to be "+ predicted);
+                                instance.setValue(j, predicted);  // Set the missing value to the predicted class
+                            }
+                        }
+                    }
+                }
+            }
+
+            System.out.println("Imputation completed.");
+
+            //Reintroduce "id" and "y" back into the data
+            for (int i = 0; i < this.trainingMissingInstances.numInstances(); i++) {
+                Instance instance = this.trainingMissingInstances.instance(i);
+                // Get the original data for this instance
+                HashMap<String, Object> originalRow = DataContainer.this.trainingDataWithMissing.get(i);
+
+                // Iterate through all attributes to check for missing values and impute them
+                System.out.println("Before update: " + originalRow);
+                for (int j = 0; j < instance.numAttributes(); j++) {
+                    String feature = instance.attribute(j).name(); // Get the feature name
+                    Object imputedValue = instance.value(j); // Get the imputed value
+
+                    originalRow.put(feature, imputedValue);  // Substitute the missing value back
+                }
+                System.out.println("After update: " + originalRow);    
+
+            }
+        }
     }
-
-    
 }
