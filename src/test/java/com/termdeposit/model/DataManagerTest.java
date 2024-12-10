@@ -122,7 +122,7 @@ public class DataManagerTest {
         // Expected output (with one-hot encoding applied)
         HashMap<String, Object> expectedOutput = new HashMap<>();
         expectedOutput.put("ID", "1");
-        expectedOutput.put("age", 42);
+        expectedOutput.put("age", 42.0);
         expectedOutput.put("job", "technician");
         expectedOutput.put("marital", "single");
         expectedOutput.put("education", "primary");
@@ -131,11 +131,11 @@ public class DataManagerTest {
         expectedOutput.put("housing", "yes");
         expectedOutput.put("loan", "yes");
         expectedOutput.put("contact", "cellular");
-        expectedOutput.put("day", 4);
+        expectedOutput.put("day", 4.0);
         expectedOutput.put("month", "jun");
-        expectedOutput.put("campaign", 1);
-        expectedOutput.put("pdays", 2);
-        expectedOutput.put("previous", 14);
+        expectedOutput.put("campaign", 1.0);
+        expectedOutput.put("pdays", 2.0);
+        expectedOutput.put("previous", 14.0);
         expectedOutput.put("poutcome", "unknown");
         expectedOutput.put("y", "yes");
 
@@ -207,6 +207,7 @@ public class DataManagerTest {
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
 
     }
+    
 
     private boolean compareListOfMapsByValue(List<HashMap<String, Object>> list1, List<HashMap<String, Object>> list2) {
         if (list1.size() != list2.size()) {

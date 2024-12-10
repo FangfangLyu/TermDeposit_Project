@@ -3,6 +3,8 @@ package com.termdeposit.model;
 
 import java.util.*;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk; //this IBk package from weka contains KNN method
@@ -20,6 +22,7 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 public class DataContainer {
     private HashMap<String,String> featureDatatype;  // TODO: For assignement 2, reflect the variable name changed from inputDatatype to featureDatatype
 
+    
     private HashMap<String,LinkedHashSet<String>> oneHotkeyValues;  //TODO: NEW
     private boolean isTrained; // TODO: NEW
 
@@ -48,6 +51,9 @@ public class DataContainer {
             throw new IllegalArgumentException("featureDatatype cannot be null");
         }
 
+        // Initializing other fields with default values
+        this.oneHotkeyValues = new HashMap<>();
+
         // Check if all values in featureDatatype are of type String, Integer, or Float
         for (String key : featureDatatype.keySet()) {
             String value = featureDatatype.get(key);
@@ -55,11 +61,13 @@ public class DataContainer {
                 throw new IllegalArgumentException("Invalid type for feature: " + key + ". Allowed types are String, Integer, or Float.");
                 // this is an unchecked exception
             }
+            if(value.equals("String")){
+                this.oneHotkeyValues.put(key, new LinkedHashSet<>());
+            }
         }
         this.featureDatatype = featureDatatype;
 
-        // Initializing other fields with default values
-        this.oneHotkeyValues = new HashMap<>();
+
         this.trainingData = new ArrayList<>();
         this.trainingDataWithMissing = new ArrayList<>(); 
 
@@ -187,7 +195,8 @@ public class DataContainer {
                 }else if("Integer".equals(this.featureDatatype.get(feature))) {
                     try {
                         Integer processedValue = Integer.parseInt(value.toString());
-                        row.put(feature, processedValue);
+                        Double doubleValue = processedValue.doubleValue();
+                        row.put(feature, doubleValue);
                     } catch (NumberFormatException e) {
                         hasMissingValue = true; // Mark as missing if parsing fails
                     }
@@ -213,6 +222,67 @@ public class DataContainer {
         }
         return row;
     }
+
+    public HashMap<String,Object> preprocessSingleAddServiceInput(HashMap<String,Object> input){
+         HashMap<String, Object> resultMap = new HashMap<>();
+         //I want all addService input, in the UI make all inputs mandatory and limit the data type, thus not checking here.
+         // Make string lowercase, 
+
+
+        for (String key : input.keySet()) {
+            Object value = input.get(key);
+
+            if (value instanceof String) {
+            resultMap.put(key, ((String) value).toLowerCase());
+            } else {
+            resultMap.put(key, value); // Just copy the value if not a String
+            }
+        } 
+        return resultMap;
+    }
+    public Double preprocessDesiredGain(Double input){
+        // Create a BigDecimal from the input, setting the desired scale (2 decimal places)
+        BigDecimal bigDecimal = new BigDecimal(input);
+
+        // Set the rounding mode to HALF_UP and round to 2 decimal places (round up here)
+        bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+
+        // Return the result as a Double
+        return bigDecimal.doubleValue();
+    }
+    
+    //TODO: I didn't include clearMemory Part, because seems no need, but be alerted about it please.
+
+    public boolean testMatchTestLabel(String filenameTesting, String filenameTestingWith_y){
+        try {
+            String resourcePath = getClass().getClassLoader().getResource("").getPath(); //default repository
+            String filePath1 = resourcePath + filenameTesting;
+            String filePath2 = resourcePath + filenameTestingWith_y;
+
+            // Read the number of rows in both files
+            int sizeFile1 = countRowsInFile(filePath1);
+            int sizeFile2 = countRowsInFile(filePath2);
+
+            // Return true if both files have the same number of rows, false otherwise
+            return sizeFile1 == sizeFile2;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false; // Return false if there was an issue reading the files
+        }
+    }
+    private int countRowsInFile(String filePath) throws IOException {
+        int rowCount = 0;
+
+        // Open the file and count the number of lines (entries)
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            while (reader.readLine() != null) {
+                rowCount++;
+            }
+        }
+        return rowCount;
+    }
+
     public void addTrainingData(List<HashMap<String,Object>> data){
         this.trainingData.addAll(data);
     }
@@ -238,7 +308,7 @@ public class DataContainer {
         private Set<String> usedIds;
 
         private String modelFilename;
-
+        private int id_counter;
         public KNN() {
 
         }
@@ -428,25 +498,13 @@ public class DataContainer {
         }
 
         private String findUnusedId() {
-            this.usedIds = new HashSet<>();
-        
-            // Collect all the used IDs from your training data
-            for (int i = 0; i < trainingInstances.numInstances(); i++) {
-                this.usedIds.add(trainingInstances.instance(i).stringValue(trainingInstances.attribute("ID")));
-            }
-        
+
             // Find an ID that is not in the used IDs set
-            String newId = "newID"; // Replace with the logic to generate a new unused ID
-            while (usedIds.contains(newId)) {
-                newId = generateNewId();  // You can implement this method to generate unique IDs
-            }
+            String newId = "id_"+ this.id_counter++;
+            System.out.println("New id generated: "+ newId);
             return newId;
         }
 
-        private String generateNewId() {
-            // Example: Create a new ID by appending a number or UUID
-            return "id_" + System.currentTimeMillis();
-        }
 
 
         // Perform KNN imputation for missing values in the dataset
@@ -526,8 +584,10 @@ public class DataContainer {
                             }
                         }
                     }
-                    
+                    System.out.println(instance);
+
                 }
+
             }
 
             System.out.println("Imputation completed.");
@@ -539,30 +599,52 @@ public class DataContainer {
                 // Get the original data for this instance
                 HashMap<String, Object> originalRow = missingData.get(i);
                 HashMap<String, Object> newRow = new HashMap<>();
-                // Get the ID and y from the originalRow
-                Object ID = originalRow.get("ID");
-                Object y = originalRow.get("y");
+
 
                 // Iterate through all attributes to check for missing values and impute them
                 System.out.println("Before update: " + originalRow);
 
 
+                // Get the ID and y from the originalRow
+                if (originalRow == null) {
+                    throw new IllegalStateException("Original row is null.");
+                }
+                Object ID = originalRow.get("ID");
+                Object y = originalRow.get("y");
+
+
+                if (y == null) {
+                    throw new IllegalStateException("'y' is missing in the original row.");
+                }
+
+                System.out.println("Before update: " + originalRow);
+
+                if (ID == null) {
+                    // Handle ID column
+
+                    String newId = findUnusedId();  // Custom method to find an unused ID
+                    System.out.println("Before update: " + originalRow);
+
+                    newRow.put("ID", newId);
+
+                    System.out.println("Missing ID replaced with: " + newId);
+                }else{
+                    newRow.put("ID", ID);
+                }
+
+                System.out.println("Before update: " + originalRow);
+
+
+                for (String uniqueValue : DataContainer.this.oneHotkeyValues.get("y")) {
+                    newRow.put("y_" + uniqueValue, y.equals(uniqueValue)? 1.0: 0.0); //because after one hot encoding, the categorical attributes get expanded.
+                }
+
+
                 for (int j = 0; j < instance.numAttributes(); j++) {
                     String feature = instance.attribute(j).name(); // Get the feature name
                     Object imputedValue = instance.value(j); // Get the imputed value
-                    String expectedType = DataContainer.this.featureDatatype.get(feature);
-
-                    if ("Integer".equals(expectedType)) {
-                        newRow.put(feature, (int) Math.round((Double)imputedValue));  // Substitute the missing value back
-                    }else {
-                        newRow.put(feature, imputedValue);  // Substitute the missing value back
-
-                    }
-
-                }
-                newRow.put("ID", ID);
-                for (String uniqueValue : DataContainer.this.oneHotkeyValues.get("y")) {
-                    newRow.put("y_" + uniqueValue, y.equals(uniqueValue)? 1.0: 0.0); //because after one hot encoding, the categorical attributes get expanded.
+                   
+                    newRow.put(feature, imputedValue);  // Substitute the missing value back
                 }
 
                 System.out.println("After update: " + newRow);

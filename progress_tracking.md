@@ -13,8 +13,8 @@ The  code in markdown format.
 |-------------|--------------        |-----------------|-------------|------------|
 | Tree Class  | sub-task 1           | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2           | 🔴 Not Started  | -           | 0%         |
-| Data Manger | KNN                  | 🟡Coding almost done  | -           | 90%         |
-|             | preprocessTraining   |  🟡Coding almost done   | -           | 85%         |
+| Data Manger | KNN                  | 🟡Coding almost done  | -           | 99%         | 
+|             | preprocessTraining   |  🟡Coding almost done   | -           | 99%         |-> note one thing, the data tpye integer -> double in preprocess.
 
 ---
 

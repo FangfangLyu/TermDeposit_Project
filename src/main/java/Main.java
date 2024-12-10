@@ -48,6 +48,8 @@ public class Main {
             System.out.println("Knn failed.");
             e.printStackTrace(); // Prints the exception and the call stack
         }
+
+        System.out.println(data.testMatchTestLabel("data/test.csv", "data/test_label.csv"));
         
 
         //System.out.println(data.gettrainingDataWithMissing());
