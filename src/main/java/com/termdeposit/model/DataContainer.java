@@ -51,7 +51,7 @@ public class DataContainer {
         // Check if all values in featureDatatype are of type String, Integer, or Float
         for (String key : featureDatatype.keySet()) {
             String value = featureDatatype.get(key);
-            if (!(value.equals("String") || value.equals("Integer")  || value.equals("Float")) ) {
+            if (!(value.equals("String") || value.equals("Integer")  || value.equals("Double")) ) {
                 throw new IllegalArgumentException("Invalid type for feature: " + key + ". Allowed types are String, Integer, or Float.");
                 // this is an unchecked exception
             }
@@ -140,12 +140,12 @@ public class DataContainer {
         while (iterator.hasNext()) {
             HashMap<String, Object> row = iterator.next();
             try{
-                preprocessSingleData(row, iterator);
+                preprocessSingleData(row);
             }catch (IllegalArgumentException e) {
                 // TODO: Possible enhancement here is to create custom Exceptions. 
                 // Handle the error gracefully
                 if (e.getMessage().equals("Fill")) {
-                    System.out.println("once");
+                    System.out.println("missing once");
                     this.trainingDataWithMissing.add(row);
                 }
                iterator.remove();
@@ -154,7 +154,7 @@ public class DataContainer {
         }
     }
 
-    public HashMap<String, Object> preprocessSingleData( HashMap<String,Object> row, Iterator<HashMap<String, Object>> iterator){
+    public HashMap<String, Object> preprocessSingleData( HashMap<String,Object> row){
         //preprocess a single data point input parameters
         /**
          * Preprocess a single data point.
@@ -191,9 +191,9 @@ public class DataContainer {
                     } catch (NumberFormatException e) {
                         hasMissingValue = true; // Mark as missing if parsing fails
                     }
-                }else if("Float".equals(this.featureDatatype.get(feature))){
+                }else if("Double".equals(this.featureDatatype.get(feature))){
                     try {
-                        Float processedValue = Float.parseFloat(value.toString());
+                        Double processedValue = Double.parseDouble(value.toString());
                         row.put(feature, processedValue);
                     } catch (NumberFormatException e) {
                         hasMissingValue = true; // Mark as missing if parsing fails
@@ -213,7 +213,9 @@ public class DataContainer {
         }
         return row;
     }
-
+    public void addTrainingData(List<HashMap<String,Object>> data){
+        this.trainingData.addAll(data);
+    }
     public List<HashMap<String, Object>> getTrainingData(){
         return this.trainingData;
     }
@@ -241,7 +243,58 @@ public class DataContainer {
 
         }
 
-        public void oneHotkeyEncoding(List<HashMap<String, Object>> data){
+        public HashMap<String, Object> oneHotkeyEncodingForSingle(HashMap<String, Object> row) {
+            HashMap<String, Object> transformedRow = new HashMap<>();
+        
+            for (Map.Entry<String, Object> entry : row.entrySet()) {
+                String feature = entry.getKey();
+                Object value = entry.getValue();
+
+
+                if (value != null) {
+                    if ("String".equals(DataContainer.this.featureDatatype.get(feature))) {
+                        // Perform one-hot encoding for string features
+                        LinkedHashSet<String> uniqueValues = DataContainer.this.oneHotkeyValues.get(feature);
+                        for (String uniqueValue : uniqueValues) {
+                            String newFeatureName = feature + "_" + uniqueValue;
+                            if (feature.equals("ID") || feature.equals("id")) {
+                                transformedRow.put(feature, value);
+                            }else{
+                                transformedRow.put(newFeatureName, uniqueValue.equals(value) ? 1.0 : 0.0);
+                            }
+
+                        }
+                    }else {
+                        if (feature.equals("ID") || feature.equals("id")) {
+                            transformedRow.put(feature, value);
+                        }else{
+                            transformedRow.put(feature, value);
+                        } 
+                    }
+                }else{
+                    transformedRow.put(feature, null);
+                }
+            }
+        
+            return transformedRow;
+        }
+
+        public List<HashMap<String, Object>> oneHotkeyEncoding(List<HashMap<String, Object>> data) {
+            List<HashMap<String, Object>> updatedTrainingData = new ArrayList<>();
+        
+            for (HashMap<String, Object> row : data) {
+                // Use the single row method to process each HashMap
+
+                HashMap<String, Object> transformedRow = oneHotkeyEncodingForSingle(row);
+                updatedTrainingData.add(transformedRow);
+            }
+        
+            return updatedTrainingData;
+        }
+        
+        
+        /* 
+        public List<HashMap<String, Object>> oneHotkeyEncoding(List<HashMap<String, Object>> data){
             List<HashMap<String,Object>> updatedTrainingData = new ArrayList<>();
 
             for (HashMap<String, Object> row : data) {
@@ -262,9 +315,12 @@ public class DataContainer {
                                 transformedRow.put(newFeatureName, null);
                             }
                         }
-                    } else {
-                        // Retain non-categorical features
-                        transformedRow.put(feature, value);
+                    } else{
+                        if(feature.equals("ID") || feature.equals("id")){
+                            transformedRow.put(feature, value);
+                        }else{
+                            transformedRow.put(feature, ((Number)value).doubleValue());
+                        }
                     }
                 }
                 updatedTrainingData.add(transformedRow);
@@ -273,7 +329,8 @@ public class DataContainer {
             // Modify the original data list
             data.clear();  // Clear the original data list
             data.addAll(updatedTrainingData);  // Add all transformed rows to the original list
-        }
+            return updatedTrainingData;
+        }*/
 
         public Instance toInstance(HashMap<String, Object> row, Instances destInstances){
             // Add complete data instances to Weka Instances object
@@ -312,8 +369,8 @@ public class DataContainer {
         }
 
         public void train() throws Exception {
-            oneHotkeyEncoding(DataContainer.this.trainingData);
 
+            DataContainer.this.trainingData = oneHotkeyEncoding(DataContainer.this.trainingData);
             // Build Weka attributes
             this.attributes = new ArrayList<>();
             
@@ -329,7 +386,7 @@ public class DataContainer {
                     for (String uniqueValue : DataContainer.this.oneHotkeyValues.get(feature)) {
                         this.attributes.add(new Attribute(feature + "_" + uniqueValue)); //because after one hot encoding, the categorical attributes get expanded.
                     }
-                } else if ("Integer".equals(this.featureList.get(feature)) || "Float".equals(this.featureList.get(feature))) {
+                } else if ("Integer".equals(this.featureList.get(feature)) || "Double".equals(this.featureList.get(feature))) {
                     //handle numeric features
                     this.attributes.add(new Attribute(feature));
                 }
@@ -391,18 +448,17 @@ public class DataContainer {
             return "id_" + System.currentTimeMillis();
         }
 
+
         // Perform KNN imputation for missing values in the dataset
-        public void imputeMissingValues() throws Exception {
+        public List<HashMap<String,Object>> imputeMissingTrainingValues(List<HashMap<String,Object>> missingData) throws Exception {
 
-            //System.out.println(DataContainer.this.trainingDataWithMissing.toString());
-            
+            List<HashMap<String,Object>> encodedData= this.oneHotkeyEncoding(missingData);
 
-            this.oneHotkeyEncoding(DataContainer.this.trainingDataWithMissing);
             // Create the Weka Instances object for KNN imputation, where features 
-            this.trainingMissingInstances = new Instances("TrainingDataMissing", this.attributes, DataContainer.this.trainingDataWithMissing.size());
+            this.trainingMissingInstances = new Instances("TrainingDataMissing", this.attributes, encodedData.size());
             
             // Add complete data instances to Weka Instances object
-            for (HashMap<String, Object> row : DataContainer.this.trainingDataWithMissing) {
+            for (HashMap<String, Object> row : encodedData) {
                 toInstance(row, this.trainingMissingInstances);
                 //System.out.println(this.trainingMissingInstances.toString());
             }
@@ -423,14 +479,12 @@ public class DataContainer {
                         System.out.println(neighbor.toString() + " & " + distances[counter]);
                         counter++;
                     }*/
-
-
                     int maxIndex = getIndex(distances);  // Find the class with the highest probability => this step is not necessary if we get one nearest neighbor, but if all neighbors have the same distance, there are many
                     System.out.println("Closet Neighbor" + this.trainingInstances.get(maxIndex));
 
                     System.out.println("**has Missing.");
                     // Iterate over all attributes
-                    for (int j = 0; j < instance.numAttributes(); j++) {
+                    /*for (int j = 0; j < instance.numAttributes(); j++) {
                         if(instance.isMissing(j)) { //TODO: IF ID IS MISSING, I WOULD PICK another not used ID.
                             String featureName = instance.attribute(j).name();
                             // Handle missing "ID" separately
@@ -443,30 +497,79 @@ public class DataContainer {
                                 System.out.println("The missing feature " + featureName + " is imputed to be "+ predicted);
                                 instance.setValue(j, predicted);  // Set the missing value to the predicted class
                             }
+
+                        }
+                    }*/
+                    for (int j = 0; j < instance.numAttributes(); j++) {
+                        String featureName = instance.attribute(j).name();
+                    
+                        if ("ID".equals(featureName)) {
+                            // Handle ID column
+                            if (instance.isMissing(j)) {
+                                String newId = findUnusedId();  // Custom method to find an unused ID
+                                instance.setValue(j, newId);
+                                System.out.println("Missing ID replaced with: " + newId);
+                            }
+                        } else if ("y".equals(featureName)) {
+                            // Keep the y column as-is (no changes needed here)
+
+                        } else {
+                            // Replace other attributes with their predicted or existing feature values
+                            if (instance.isMissing(j)) {
+                                double predicted = neighbours.get(maxIndex).value(instance.attribute(j));
+                                System.out.println("The missing feature " + featureName + " is imputed to be " + predicted);
+                                instance.setValue(j, predicted);  // Set missing feature to predicted value
+                            } else {
+                                double originalValue = instance.value(instance.attribute(j));
+                                System.out.println("Retaining original value for " + featureName + ": " + originalValue);
+                                instance.setValue(j, originalValue);  // Retain the original feature value
+                            }
                         }
                     }
+                    
                 }
             }
 
             System.out.println("Imputation completed.");
 
             //Reintroduce "id" and "y" back into the data
+            List<HashMap<String,Object>> results = new LinkedList<>();
             for (int i = 0; i < this.trainingMissingInstances.numInstances(); i++) {
                 Instance instance = this.trainingMissingInstances.instance(i);
                 // Get the original data for this instance
-                HashMap<String, Object> originalRow = DataContainer.this.trainingDataWithMissing.get(i);
+                HashMap<String, Object> originalRow = missingData.get(i);
+                HashMap<String, Object> newRow = new HashMap<>();
+                // Get the ID and y from the originalRow
+                Object ID = originalRow.get("ID");
+                Object y = originalRow.get("y");
 
                 // Iterate through all attributes to check for missing values and impute them
                 System.out.println("Before update: " + originalRow);
+
+
                 for (int j = 0; j < instance.numAttributes(); j++) {
                     String feature = instance.attribute(j).name(); // Get the feature name
                     Object imputedValue = instance.value(j); // Get the imputed value
+                    String expectedType = DataContainer.this.featureDatatype.get(feature);
 
-                    originalRow.put(feature, imputedValue);  // Substitute the missing value back
+                    if ("Integer".equals(expectedType)) {
+                        newRow.put(feature, (int) Math.round((Double)imputedValue));  // Substitute the missing value back
+                    }else {
+                        newRow.put(feature, imputedValue);  // Substitute the missing value back
+
+                    }
+
                 }
-                System.out.println("After update: " + originalRow);    
+                newRow.put("ID", ID);
+                for (String uniqueValue : DataContainer.this.oneHotkeyValues.get("y")) {
+                    newRow.put("y_" + uniqueValue, y.equals(uniqueValue)? 1.0: 0.0); //because after one hot encoding, the categorical attributes get expanded.
+                }
 
+                System.out.println("After update: " + newRow);
+
+                results.add(newRow);
             }
+            return results;
         }
     }
 }

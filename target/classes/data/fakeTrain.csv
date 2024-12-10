@@ -1,32 +1,5 @@
 ID,age,job,marital,education,default,balance,housing,loan,contact,day,month,campaign,pdays,previous,poutcome,y
 
 13829,29,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
-22677,26,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no
-10541,30,management,single,secondary,no,135,no,no,cellular,14,aug,2,-1,0,unknown,no
-13689,41,technician,married,unknown,no,30,yes,no,cellular,10,jul,1,-1,0,unknown,no
-11304,27,admin.,single,secondary,no,321,no,yes,unknown,2,sep,1,-1,0,unknown,no
-15046,22,student,single,secondary,no,185,no,no,cellular,8,jul,1,-1,0,unknown,yes
-15505,53,blue-collar,married,secondary,no,1777,yes,no,cellular,21,nov,5,154,1,failure,yes
-22341,38,admin.,divorced,secondary,no,74,yes,no,cellular,23,jul,3,-1,0,unknown,no
-18051,59,management,married,tertiary,no,3342,no,no,cellular,18,mar,2,188,6,other,yes
-15826,37,housemaid,single,secondary,no,465,yes,no,cellular,18,may,3,-1,0,unknown,yes
-14385,47,admin.,married,secondary,no,84,no,no,telephone,29,aug,3,-1,0,unknown,no
-10769,38,management,single,tertiary,no,0,yes,no,unknown,8,may,3,-1,0,unknown,no
-22503,48,services,married,secondary,no,473,no,yes,cellular,6,aug,2,-1,0,unknown,no
-12996,30,admin.,married,secondary,no,2931,yes,no,unknown,29,may,3,-1,0,unknown,no
-14637,90,retired,divorced,primary,no,712,no,no,telephone,3,mar,1,-1,0,unknown,yes
-15825,53,admin.,married,secondary,no,0,no,no,telephone,6,sep,1,655,5,failure,no
-19388,36,technician,married,tertiary,no,0,no,no,cellular,22,aug,2,-1,0,unknown,no
-10749,31,management,married,tertiary,no,91,no,no,unknown,27,may,2,-1,0,unknown,no
-19264,52,admin.,divorced,secondary,no,1049,no,yes,unknown,4,jun,6,-1,0,unknown,no
-10503,39,unemployed,married,primary,no,7005,yes,no,cellular,28,jul,2,184,3,success,yes
-10219,58,services,married,secondary,no,382,no,no,cellular,26,aug,4,-1,0,unknown,no
-18535,35,blue-collar,married,primary,no,2953,yes,no,telephone,6,may,2,-1,0,unknown,no
-22406,20,blue-collar,single,secondary,no,76,yes,no,cellular,18,may,2,-1,0,unknown,yes
-18191,29,self-employed,single,tertiary,no,805,no,no,cellular,1,jul,2,128,8,success,no
-18163,41,management,married,tertiary,no,0,no,no,cellular,17,sep,4,63,11,other,yes
-18962,52,unknown,married,primary,no,547,no,no,unknown,6,jun,2,-1,0,unknown,no
-22528,47,admin.,married,secondary,no,2354,yes,no,unknown,15,may,1,-1,0,unknown,no
-11744,30,services,married,secondary,no,0,yes,no,cellular,21,nov,4,-1,0,unknown,yes
 
-1,22,student,single,,no,185,no,no,cellular,8,jul,1,-1,0,unknown,yes
+1,,student,single,,no,185,no,no,cellular,8,jul,1,-1,0,unknown,yes

@@ -19,8 +19,8 @@ public class Main {
         dataTypeMap.put("job", "String");          // Job is a categorical feature (String)
         dataTypeMap.put("marital", "String");      // Marital status is a categorical feature (String)
         dataTypeMap.put("education", "String");    // Education level is a categorical feature (String)
-        dataTypeMap.put("default", "String");     // Default is a binary feature (Boolean)
-        dataTypeMap.put("balance", "Float");       // Balance is a continuous numerical value (Float)
+        /*dataTypeMap.put("default", "String");     // Default is a binary feature (Boolean)
+        dataTypeMap.put("balance", "Double");       // Balance is a continuous numerical value (Float)
         dataTypeMap.put("housing", "String");     // Housing is a binary feature (Boolean)
         dataTypeMap.put("loan", "String");        // Loan is a binary feature (Boolean)
         dataTypeMap.put("contact", "String");      // Contact type is a categorical feature (String)
@@ -29,19 +29,21 @@ public class Main {
         dataTypeMap.put("campaign", "Integer");    // Campaign is a numerical value (Integer)
         dataTypeMap.put("pdays", "Integer");       // Pdays is a numerical value (Integer)
         dataTypeMap.put("previous", "Integer");    // Previous is a numerical value (Integer)
-        dataTypeMap.put("poutcome", "String");     // Poutcome is a categorical feature (String)
+        dataTypeMap.put("poutcome", "String");     // Poutcome is a categorical feature (String)*/
         dataTypeMap.put("y", "String");            // Target variable (y) is typically a String or Boolean
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
 
-        String trainingSetPath = "data/FakeTrain.csv";
+        String trainingSetPath = "data/fake2.csv";
         
         data.preprocessData(trainingSetPath, false);
         try{
             knn.train();
             knn.saveModel("knn.bin");
-            knn.imputeMissingValues();
+            data.getTrainingData().addAll(knn.imputeMissingTrainingValues(data.gettrainingDataWithMissing()));
+            System.out.println(data.getTrainingData());
+
         }catch(Exception e){
             System.out.println("Knn failed.");
             e.printStackTrace(); // Prints the exception and the call stack
