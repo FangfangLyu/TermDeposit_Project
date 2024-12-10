@@ -21,7 +21,7 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 
 public class DataContainer {
     private HashMap<String,String> featureDatatype;  // TODO: For assignement 2, reflect the variable name changed from inputDatatype to featureDatatype
-
+    private HashMap<String,String> featureDatatype_afterTrain; 
     
     private HashMap<String,LinkedHashSet<String>> oneHotkeyValues;  //TODO: NEW
     private boolean isTrained; // TODO: NEW
@@ -66,6 +66,7 @@ public class DataContainer {
             }
         }
         this.featureDatatype = featureDatatype;
+        this.featureDatatype_afterTrain = new HashMap<String,String>();
 
 
         this.trainingData = new ArrayList<>();
@@ -295,6 +296,9 @@ public class DataContainer {
     public List<HashMap<String, Object>> gettrainingDataWithMissing(){
         return this.trainingDataWithMissing;
     }
+    public HashMap<String,String> getFeatureAfterTrain(){
+        return this.featureDatatype_afterTrain;
+    }
 
     //nested inner class (non-static nested class)        
     public class KNN {
@@ -329,16 +333,22 @@ public class DataContainer {
                             String newFeatureName = feature + "_" + uniqueValue;
                             if (feature.equals("ID") || feature.equals("id")) {
                                 transformedRow.put(feature, value);
+                                DataContainer.this.featureDatatype_afterTrain.put(feature, "String");
                             }else{
                                 transformedRow.put(newFeatureName, uniqueValue.equals(value) ? 1.0 : 0.0);
+                                DataContainer.this.featureDatatype_afterTrain.put(newFeatureName, "String");
                             }
 
                         }
                     }else {
                         if (feature.equals("ID") || feature.equals("id")) {
                             transformedRow.put(feature, value);
+                            //this will not occur (should be)
                         }else{
                             transformedRow.put(feature, value);
+                            DataContainer.this.featureDatatype_afterTrain.put(feature, DataContainer.this.featureDatatype.get(feature)); //store the truth feature type
+                            //TODO: downside of the approach is that the featureDatatype_afterTrain is getting refreshed each time. Should have a separate loop of handling this
+
                         } 
                     }
                 }else{

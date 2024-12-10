@@ -6,13 +6,16 @@ The  code in markdown format.
 
 ## 📝 Member Progress
 
-### **Member 1: Daisy** | **Progress: 0%**  
+### **Member 1: Daisy** | **Progress: 10%**  
 ---  
 
 | Component   | Sub-Task             | Status          | Test Result | Completion |
 |-------------|--------------        |-----------------|-------------|------------|
 | Tree Class  | sub-task 1           | 🔴 Not Started  | -           | 0%         |
 |             | sub-task 2           | 🔴 Not Started  | -           | 0%         |
+| Forest Class  | generate subsets  | 🟢 Completed    | -           | 100%         |
+|                | growTree  | 🔴 Not Started   | -           |  0%       |
+|                | prediction  | 🔴 Not Started    | -           |  0%       |
 | Data Manger | KNN                  | 🟡Coding almost done  | -           | 99%         | 
 |             | preprocessTraining   |  🟡Coding almost done   | -           | 99%         |-> note one thing, the data tpye integer -> double in preprocess.
 

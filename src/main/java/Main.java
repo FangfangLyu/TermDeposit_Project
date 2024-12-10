@@ -4,8 +4,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import com.termdeposit.model.DataContainer;
+import com.termdeposit.model.RandomForest;
 
 
 public class Main {
@@ -34,6 +36,8 @@ public class Main {
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
+        RandomForest forest = new RandomForest(data,42);
+
 
         String trainingSetPath = "data/fake2.csv";
         
@@ -43,6 +47,10 @@ public class Main {
             knn.saveModel("knn.bin");
             data.getTrainingData().addAll(knn.imputeMissingTrainingValues(data.gettrainingDataWithMissing()));
             System.out.println(data.getTrainingData());
+            System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
+            System.out.println("RandomForest-------------");
+
+            System.out.println(forest.getRandomTrainingSubset(2,2));
 
         }catch(Exception e){
             System.out.println("Knn failed.");
