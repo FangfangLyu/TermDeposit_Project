@@ -2,10 +2,11 @@
 
 # Assignment 0: Term Deposit Potential Investor Prediction Proposal
 
-## Group Members
-- Kathy He
-- Fangfang (Daisy) Lyu
-- Nathaniel Tang
+## Group Members from Queens College 
+### Software Engineering Course (Fall 2024)
+- He, Kathy
+- Lyu, Fangfang (Daisy)
+- Tang, Nathaniel 
 
 ## Dataset Chosen
 - Dataset: [Bank Marketing Response Predict](https://www.kaggle.com/datasets/kukuroo3/bank-marketing-response-predict/data?select=train.csv)
