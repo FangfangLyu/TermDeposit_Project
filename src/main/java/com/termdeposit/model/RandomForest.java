@@ -67,6 +67,7 @@ public class RandomForest {
     public Tree growTreeInitial(List<List<HashMap<String, Object>>> trainingData) {
         // Implement logic to grow an initial tree
         Tree tree = new Tree();
+        tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
         tree.growTree(trainingData);
         return tree;
     }

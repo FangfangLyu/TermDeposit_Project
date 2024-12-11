@@ -1,3 +1,4 @@
+package com.termdeposit.model;
 public class TreeNode {
 
 
@@ -12,6 +13,7 @@ public class TreeNode {
     private Threshold threshold;
 
     public TreeNode() {
+
         
     }//constructor
 
@@ -27,11 +29,11 @@ public class TreeNode {
         return isResultNode;
     }
 
-    public float getPurity(){
+    public float getImpurity(){
         return impurity;
     }
 
-    public void setPurity(float imp) {
+    public void setImpurity(float imp) {
         impurity = imp;
     }
 

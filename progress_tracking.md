@@ -11,7 +11,7 @@ The  code in markdown format.
 
 | Component   | Sub-Task             | Status          | Test Result | Completion |
 |-------------|--------------        |-----------------|-------------|------------|
-| Tree Class  | sub-task 1           | 🔴 Not Started  | -           | 0%         |
+| Tree Class  | predict method           | 🟡Coding almost done  | -           | 50%         |
 |             | sub-task 2           | 🔴 Not Started  | -           | 0%         |
 | Forest Class  | generate subsets  | 🟢 Completed    | -           | 100%         |
 |                | growTree  | 🔴 Not Started   | -           |  0%       |
