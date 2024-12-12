@@ -1,11 +1,10 @@
-package target.classes.com.termdeposit.model;
-
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.List;
 import java.io.File;
 
 public class UserView extends JFrame{
+    private JButton button;
     private JLabel label;
     private JMenu file, functions;
     private JMenuBar menuBar;
@@ -62,9 +61,19 @@ public class UserView extends JFrame{
         functions.add(calc);
         menuBar.add(functions);
 
+        button = new JButton("temp");
+        button.setBounds(100,50,100,30);
+        add(button);
+
         label = new JLabel("temp");
         label.setBounds(100,100,100,30);
         add(label);
+
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                label.setText("Button Clicked");
+            }
+        });
 
         setJMenuBar(menuBar);
         setVisible(true);
