@@ -1,7 +1,5 @@
 package com.termdeposit.model;
 public class TreeNode {
-
-
     private boolean isResultNode;
     private boolean result;
 
@@ -13,8 +11,10 @@ public class TreeNode {
     private Threshold threshold;
 
     public TreeNode() {
-
-        
+        this.isResultNode = false;
+        this.left = null;
+        this.right = null;
+        this.isNumFeature = false;
     }//constructor
 
     public boolean getResult() {
@@ -52,7 +52,7 @@ public class TreeNode {
     }
 
     public void setRight(TreeNode r) {
-        right = r;
+        this.right = r;
     }
 
     public TreeNode getLeft(){
@@ -60,7 +60,7 @@ public class TreeNode {
     }
 
     public void setLeft(TreeNode l) {
-        left = l;
+        this.left = l;
     }
 
     public Threshold getThreshold() {

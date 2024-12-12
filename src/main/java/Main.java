@@ -55,6 +55,10 @@ public class Main {
             Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
             treeInstance.growTree();
+            
+            System.out.println("Tree-------------");
+
+            treeInstance.printTree();
 
 
 

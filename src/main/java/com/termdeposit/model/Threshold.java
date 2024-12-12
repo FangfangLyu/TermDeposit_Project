@@ -22,12 +22,6 @@ public class Threshold {
         return type;
     }
 
-    public void setType(String t) {
-        if (t == "Categorical || Numerical") {
-            type = t;
-        }
-    }
-
     public boolean compare(Object featureValue){
         if ((this.type.equals("Integer") || this.type.equals("Double")) && this.value instanceof Number) {
             return subNumericGivenStrictlyGreater(featureValue); //TODO: I changed the method's name and functionality a bit, but doesn't affect the usage.
@@ -43,8 +37,11 @@ public class Threshold {
     // Checks if the featureValue is equivalent for a categorical threshold
     public boolean subCategoryEquivalent(Object featureValue) {
         if (type.equals("String") && featureValue instanceof String) {
+            System.out.println("String featurevalue in threadhold:"+featureValue);
             return featureValue.equals(value);
         }else if (type.equals("String") && featureValue instanceof Number) { //due to current implementation all String are expressed in double
+            System.out.println("String in number featurevalue in threadhold:"+featureValue);
+
             double numericValue = ((Number) value).doubleValue();
             double numericValueGiven = ((Number) featureValue).doubleValue();
 
@@ -55,8 +52,9 @@ public class Threshold {
 
     // Checks if a numeric featureValue is greater than the threshold
     public boolean subNumericGivenStrictlyGreater(Object featureValue) {
-        if ((type.equals("Integer")||type.equals("Double")) && featureValue instanceof Number) {
-            return ((Number) featureValue).doubleValue() > ((Number) value).doubleValue();
+        if ((type.equals("Integer")||type.equals("Double"))) {
+            System.out.println("Number featurevalue in threadhold:"+featureValue);
+            return ((Number) featureValue).doubleValue() >= ((Number) value).doubleValue();
         }
         return false;
     }

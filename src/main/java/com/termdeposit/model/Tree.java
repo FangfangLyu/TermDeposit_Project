@@ -47,17 +47,57 @@ public class Tree {
         return false;
     }
 
+    // Helper method to print indentation based on tree depth
+    private void printIndentation(int level) {
+        for (int i = 0; i < level; i++) {
+            System.out.print("    "); // Indentation for better readability
+        }
+    }
+    public void printTree() {
+        // Helper method for recursive traversal and printing
+        printTreeRecursive(root, 0);
+    }
+    
+    // Recursive method to print the tree
+    private void printTreeRecursive(TreeNode node, int level) {
+        if (node == null) {
+            System.out.println("Node is null");
+
+            return; // Base case: if the node is null, do nothing
+        }
+        
+        // Print the current node with indentation based on tree level
+        printIndentation(level);
+    
+        if (node.isLeaf()) {
+            // If it's a leaf node, print its label
+            System.out.println("Leaf: " + node.getThreshold().toString());
+        } else {
+            // If it's an internal node, print feature and threshold
+            System.out.println("Feature: " + node.getFeatName() + " <= " + node.getThreshold().toString());
+            System.out.println("Left Child: ");
+            // Recursively print the left child
+            printTreeRecursive(node.getLeft(), level + 1);
+            
+            System.out.println("Right Child: ");
+            // Recursively print the right child
+            printTreeRecursive(node.getRight(), level + 1);
+        }
+    }
+
     public TreeNode growTree(){
         //need code;
         this.featureDataType.remove("ID");
-        grow(1, root, featureDataType,trainingData,false);
+        TreeNode initialNode = new TreeNode();
+        grow(1, initialNode, featureDataType,trainingData);
         System.out.println("Tree grown");
 
+        root = initialNode;
         return root;
     }
 
 
-    public void grow(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, boolean resultNode) {
+    public void grow(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData) {
         // Initialize the best impurity, best threshold, and best splits
         double minImpurity = 1;
 
@@ -67,10 +107,12 @@ public class Tree {
     
         Object result_threshold_value = null;
         boolean featureTypeIsNum = false;
+        boolean isLeftNull=true, isRightNull = true;
 
-        boolean isLeftNull=false, isRightNull = false;
+        boolean conditionForResult = (remainingTrainingData.size() < this.treeMinSampleSplit) 
+                                    || treeMaxLayer <= layer || remainingFeatures.size() <= 1; //only ID column remains
 
-        if( (remainingTrainingData.size() < this.treeMinSampleSplit) || treeMaxLayer <= layer || (remainingFeatures.size() <= 1 || resultNode)){
+        if( (conditionForResult)){
             int yesCount = 0;
             int noCount = 0;
             
@@ -82,14 +124,20 @@ public class Tree {
                 }
             }
             currentNode.setResult(yesCount>noCount);
-            
             System.out.println("result node.");
-
             return;
         }
 
         if (remainingTrainingData.size() >= this.treeMinSampleSplit || remainingFeatures.size() > 1) {
+            /*TODO: this method could be handled properly if we could modularize it.
+            But the contrainint at this point is that we didn't specific label the name of ID row and y row in the beginning.
+            So we have only fixed the row name to "ID" and "y"
+            And there could be too many data passing by parameter if we don't make some of the varible more compact or store it in the class scope.
+            This requires more design and thinking, due to time constraint, out goal is to create a running prototype first. 
+            */
             for (String feature : remainingFeatures.keySet()) {
+
+                boolean isLeftNull_temp=true, isRightNull_temp = true; 
 
                 // Skip ID or target column (y)
                 if (feature.equals("ID") || feature.equals("y")) {
@@ -110,8 +158,10 @@ public class Tree {
 
                 List<HashMap<String, Object>> trainingDataLeft = new ArrayList<>();
                 List<HashMap<String, Object>> trainingDataRight = new ArrayList<>();
-                int yesSideCounter = 0;  // For Gini impurity calculation
-                
+            
+                // Calculate Gini Impurity for both sides (Left and Right)
+                int leftYes = 0, leftNo = 0, rightYes = 0, rightNo = 0;
+                //speical handling needed if any side is empty
 
                 Object compareTo = null;
     
@@ -119,200 +169,247 @@ public class Tree {
                     // Handling categorical features (String type)
                     for (HashMap<String, Object> point : remainingTrainingData) {
                         compareTo = point.get(feature); // The threshold is the category value
-                        Threshold temp = new Threshold(point.get(feature), type);
+                        Threshold temp = new Threshold(point.get(feature).toString(), type);
     
                         // Split data based on comparison
-                        if (temp.compare(compareTo)) {
+                        if (temp.compare(compareTo.toString())) {
+                            isRightNull_temp = false;
+                            //calculate the right branch's impurity
                             trainingDataRight.add(point);
                             if (point.get("y").equals("yes")) {
-                                yesSideCounter++;
+                                System.out.println("Right got a yes");
+                                rightYes++;
+                            }else{
+                                rightNo++;
+                                System.out.println("Right got a no");
+
                             }
                         } else {
+                            isRightNull_temp = false;
+                            //calculate the right branch's impurity
                             trainingDataLeft.add(point);
-                        }
-                    }
-    
-                    // Calculate Gini Impurity for both sides (Left and Right)
-                    int leftYes = 0, leftNo = 0, rightYes = yesSideCounter, rightNo = dataSize - yesSideCounter;
-                    
-                    System.out.println("Size of left data:"+trainingDataLeft.size());
-
-                    //TODO: if empty
-                    if(trainingDataLeft.size() == 0){
-                        isLeftNull_temp = true;
-                        System.out.println("Left branch is empty");
-                        
-                    }else{
-                        for (HashMap<String, Object> leftPoint : trainingDataLeft) {
-                            System.out.println(leftPoint);
-                            if (leftPoint.get("y").equals("yes")) {
+                            if (point.get("y").equals("yes")) {
                                 leftYes++;
                                 System.out.println("Left got a yes");
-                            } else {
+
+                            }else{
                                 leftNo++;
                                 System.out.println("Left got a no");
 
                             }
-                        } 
+                        }
                     }
 
-                    //TODO: if empty
-                    if(trainingDataRight.size() == 0){
-                        isRightNull = true;
-                        System.out.println("Right branch is empty");
-
-
-                    }else{
-                        for (HashMap<String, Object> rightPoint : trainingDataRight) {
-                            if (rightPoint.get("y").equals("yes")) {
-                                rightYes++;
-                            } else {
-                                rightNo++;
-                            }
-                        } 
-                    }
+                    System.out.println("Size of left data:"+trainingDataLeft.size());
     
                     // Calculate Gini Impurity for both splits
+                    double leftGini;
+                    double rightGini;
+                    System.out.println("Left is null condition " + isLeftNull_temp);
 
-                    double leftGini = 1 - Math.pow( ((double)leftYes )/ trainingDataLeft.size(), 2) - Math.pow(((double) leftNo) / trainingDataLeft.size(), 2);
-                    double rightGini = 1 - Math.pow((double) rightYes / trainingDataRight.size(), 2) - Math.pow((double) rightNo / trainingDataRight.size(), 2);
-                    
-                    if(isLeftNull){
+                    System.out.println("Right is null condition " + isRightNull_temp);
+
+                    if(isLeftNull_temp){
                         leftGini = 1;
+                        System.out.println("Left is null " + isRightNull_temp);
+
+                    }else{
+                        leftGini = 1 - Math.pow( ((double)leftYes )/ trainingDataLeft.size(), 2) - Math.pow(((double) leftNo) / trainingDataLeft.size(), 2);
+
                     }
-                    if(isRightNull){
+                    if(isRightNull_temp){
                         rightGini = 1;
+                        System.out.println("Right is null " + isRightNull_temp);
+                    }else{
+                        rightGini = 1 - Math.pow((double) rightYes / trainingDataRight.size(), 2) - Math.pow((double) rightNo / trainingDataRight.size(), 2);
+
                     }
 
                     System.out.println("Left Gini" + leftGini);
                     System.out.println("Right Gini" + rightGini);
 
 
-
                     // Weighted Gini Impurity for the split
                     currentImpurity = (trainingDataLeft.size() / (double) dataSize) * leftGini + (trainingDataRight.size() / (double) dataSize) * rightGini;
                     
-                    if(currentImpurity==0){
-                        featureTypeIsNum = false;
-                        minImpurity = currentImpurity;
-                        result_threshold_value = compareTo;
-                        trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
-                        trainingDataRight_final = new ArrayList<>(trainingDataRight);
-                        min.clear();
-                        min.put(feature, new Threshold(compareTo, type));
-                        break;
-                    }
+                    System.out.println("Weighted Impurity: "+ currentImpurity+"****");
 
-                    // Update the best split if the current split has lower impurity
-                    if (currentImpurity < minImpurity) {
-                        featureTypeIsNum = false;
-                        minImpurity = currentImpurity;
-                        result_threshold_value = compareTo;
-                        trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
-                        trainingDataRight_final = new ArrayList<>(trainingDataRight);
-                        min.clear();
-                        min.put(feature, new Threshold(compareTo, type));
-                    }
-    
                 } else {
                     // Handling numerical features (non-String type)
                     // Generate random samples to check for potential splits
                     int testNum = Math.max((int) Math.min(50.0, Math.sqrt(dataSize)),1);
-                    double localMinImpurity = 1;
-                    Object tmp_result_threshold_value = null;
-                    boolean isLeftNull_temp = false, isRightNull_temp = false;
 
+                    HashMap<String, Threshold> min_local = new HashMap<>();
+                    double localMinImpurity_best = 1;
+                    //Object result_threshold_value_best = null;
+
+                    List<HashMap<String, Object>> trainingDataLeft_best= new ArrayList<>();
+                    List<HashMap<String, Object>> trainingDataRight_best = new ArrayList<>();
+                
+                    boolean isNullLeft_localBest=true, isNullRight_localBest=true;
     
                     for (int i = 0; i < testNum; i++) {
                         int randomIndex = random.nextInt(dataSize);
                         compareTo = remainingTrainingData.get(randomIndex).get(feature);
-    
-                        trainingDataLeft.clear();
-                        trainingDataRight.clear();
+                        System.out.println("CompareTo for numerical: "+ compareTo);
+                        
+                        boolean isNullLeft_local=true, isNullRight_local=true;
+                            
+                        List<HashMap<String, Object>> trainingDataLeft_local = new ArrayList<>();
+                        List<HashMap<String, Object>> trainingDataRight_local = new ArrayList<>();
+                    
+                        trainingDataLeft_local.clear();
+                        trainingDataRight_local.clear();
     
                         // Counters for Gini Impurity calculation
-                        int localYesSideCounter = 0;
+                        int local_leftYes = 0, local_leftNo = 0,local_rightYes = 0, local_rightNo = 0;
     
                         // Split data based on the threshold value
                         for (HashMap<String, Object> point : remainingTrainingData) {
                             Threshold temp = new Threshold(point.get(feature), type);
-                            if (temp.compare(compareTo)) {
-                                trainingDataRight.add(point);
+                            if (temp.compare((Double)compareTo)) {
+                                isNullLeft_local = false;
+
+                                trainingDataRight_local.add(point);
                                 if (point.get("y").equals("yes")) {
-                                    localYesSideCounter++;
+                                    local_rightYes++;
+                                    System.out.println("Right got a yes");
+                                }else{
+                                    local_rightNo++;
+                                    System.out.println("Right got a no");
+
                                 }
                             } else {
-                                trainingDataLeft.add(point);
+                                isNullLeft_local = false;
+                                trainingDataLeft_local.add(point);
+                                if (point.get("y").equals("yes")) {
+                                    leftYes++;
+                                    System.out.println("Left got a yes");
+    
+                                }else{
+                                    leftNo++;
+                                    System.out.println("Left got a no");
+    
+                                }
                             }
                         }
     
-                        // Gini Impurity calculation for the left and right sides
-                        int localLeftYes = 0, localLeftNo = 0, localRightYes = localYesSideCounter, localRightNo = dataSize - localYesSideCounter;
+                        System.out.println("Size of left data:"+trainingDataLeft_local.size());
     
-                        for (HashMap<String, Object> leftPoint : trainingDataLeft) {
-                            if (leftPoint.get("y").equals("yes")) {
-                                localLeftYes++;
-                            } else {
-                                localLeftNo++;
-                            }
+                        // Calculate Gini Impurity for both splits
+                        double leftGini;
+                        double rightGini;
+                        System.out.println("Left is null condition " + isNullLeft_local);
+                        System.out.println("Right is null condition " + isNullRight_local);
+                            
+                        if(isNullLeft_local){
+                            leftGini = 1;
+                            System.out.println("Left is null " + isNullRight_local);
+
+                        }else{
+                            leftGini = 1 - Math.pow((double) local_leftYes / trainingDataLeft_local.size(), 2) - Math.pow((double) local_leftNo / trainingDataLeft_local.size(), 2);
+
                         }
-    
-                        double leftGini = 1 - Math.pow((double) localLeftYes / trainingDataLeft.size(), 2) - Math.pow((double) localLeftNo / trainingDataLeft.size(), 2);
-                        double rightGini = 1 - Math.pow((double) localRightYes / trainingDataRight.size(), 2) - Math.pow((double) localRightNo / trainingDataRight.size(), 2);
+                        if(isRightNull_temp){
+                            rightGini = 1;
+                            System.out.println("Right is null " + isNullRight_local);
+                        }else{
+                            rightGini = 1 - Math.pow((double) local_rightYes / trainingDataRight_local.size(), 2) - Math.pow((double) local_rightNo / trainingDataRight_local.size(), 2);
+
+                        }
     
                         // Weighted Gini Impurity for this test split
-                        double testImpurity = (trainingDataLeft.size() / (double) dataSize) * leftGini + (trainingDataRight.size() / (double) dataSize) * rightGini;
-    
-                        
-                        // Update the best threshold if the current test impurity is lower
-                        if (testImpurity < localMinImpurity) {
-                            featureTypeIsNum = true;
-                            localMinImpurity = testImpurity;
-                            tmp_result_threshold_value = compareTo;
+                        double testImpurity = (trainingDataLeft_local.size() / (double) dataSize) * leftGini + (trainingDataRight_local.size() / (double) dataSize) * rightGini;
+        
+                        if(testImpurity==0.0 || testImpurity < localMinImpurity_best){
+                            //featureTypeIsNum = true;
+                            //First make this the local best
+                            localMinImpurity_best = currentImpurity;
+                            trainingDataLeft_best = new ArrayList<>(trainingDataLeft_local);
+                            trainingDataRight_best = new ArrayList<>(trainingDataRight_local);
+
+                            isNullLeft_localBest = isNullLeft_local;
+                            isNullRight_localBest = isNullRight_local;
+
+                            min_local.clear();
+
+                            min_local.put(feature, new Threshold(compareTo, type));
+
+                            if(testImpurity == 0.0){
+                                break;
+                            }
                         }
                     }
-    
-                    // After checking all test splits, update if necessary
-                    currentImpurity = localMinImpurity;
-                    result_threshold_value = tmp_result_threshold_value;
-    
-                    if (currentImpurity < minImpurity) {
-                        minImpurity = currentImpurity;
-                        trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
-                        trainingDataRight_final = new ArrayList<>(trainingDataRight);
-                        min.clear();
-                        min.put(feature, new Threshold(result_threshold_value, type));
+                    isLeftNull_temp = isNullLeft_localBest;
+                    isRightNull_temp = isNullRight_localBest;
+                }
+                //for both data type same handling
+                if(currentImpurity==0){
+                    featureTypeIsNum = false;
+                    minImpurity = currentImpurity;
+                    result_threshold_value = compareTo;
+                    trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
+                    trainingDataRight_final = new ArrayList<>(trainingDataRight);
+                    min.clear();
+                    if(featureTypeIsNum){
+                        min.put(feature, new Threshold((Double)compareTo, type));
+
+                    }else{
+                        min.put(feature, new Threshold(compareTo.toString(), type));
+
+                    }
+                    isLeftNull = isLeftNull_temp;
+                    isRightNull = isLeftNull_temp;
+                    break;
+                }
+                // Update the best split if the current split has lower impurity
+                if (currentImpurity < minImpurity) {
+                    featureTypeIsNum = false;
+                    minImpurity = currentImpurity;
+                    trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
+                    trainingDataRight_final = new ArrayList<>(trainingDataRight);
+                    min.clear();
+                    if(featureTypeIsNum){
+                        min.put(feature, new Threshold((Double)compareTo, type));
+
+                    }else{
+                        min.put(feature, new Threshold(compareTo.toString(), type));
+
                     }
                 }
-    
             }
         }
+        //define the node here
+        currentNode.setImpurity(minImpurity);
+        String featureName = min.keySet().iterator().next();
+        currentNode.setFeatName(featureName, featureTypeIsNum);
+        currentNode.setThreshold(min.get(featureName));
         // Recursively set the left and right children of the current node 
-        if(!isLeftNull){
-            TreeNode leftChild = new TreeNode();
-            leftChild.setFeatName(min.keySet().iterator().next(), featureTypeIsNum); // get feature Name
-        
-            remainingFeatures.remove(min.keySet().iterator().next());
-            currentNode.setLeft(leftChild);
+        remainingFeatures.remove(featureName);
+        System.out.println(remainingFeatures);
 
+        if(!isLeftNull){
+            TreeNode leftChild = new TreeNode();        
+            System.out.println("Left is not null.");
 
             if(isRightNull){
-                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final,true);
+                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final);
+                System.out.println("leftChild grown for " + currentNode );
             }else{
-                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final,false);
+                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final);
+                System.out.println("leftChild grown not result " + currentNode );
             }
+            printIndentation(layer);
+            System.out.print("Left child of the current Node:" + leftChild);
+            currentNode.setLeft(leftChild);
+
         }
         if(!isRightNull){
-            TreeNode rightChild = new TreeNode();
-            rightChild.setFeatName(min.keySet().iterator().next(), featureTypeIsNum); // get feature Name
-        
-            remainingFeatures.remove(min.keySet().iterator().next());
-
+            TreeNode rightChild = new TreeNode();        
             currentNode.setRight(rightChild);
             if(isLeftNull){
-                grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final,true);
-            }else{
-                grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final,false);
+                grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final);
+                System.out.println("rightChild grown for " + currentNode );
             }
         }
         
