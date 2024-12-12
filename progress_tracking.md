@@ -12,12 +12,14 @@ The  code in markdown format.
 | Component   | Sub-Task             | Status          | Test Result | Completion |
 |-------------|--------------        |-----------------|-------------|------------|
 | Tree Class  | predict method           | 🟡Coding almost done  | -           | 50%         |
-|             | sub-task 2           | 🔴 Not Started  | -           | 0%         |
+|             | grow           | 🟡Coding  | -           | 50%         |
 | Forest Class  | generate subsets  | 🟢 Completed    | -           | 100%         |
-|                | growTree  | 🔴 Not Started   | -           |  0%       |
+|                | growTree  | 🟡Coding   | -           |  50%       |
 |                | prediction  | 🔴 Not Started    | -           |  0%       |
 | Data Manger | KNN                  | 🟡Coding almost done  | -           | 99%         | 
-|             | preprocessTraining   |  🟡Coding almost done   | -           | 99%         |-> note one thing, the data tpye integer -> double in preprocess.
+|             | preprocessTraining   |  🟡Coding almost done   | -           | 99%         |
+
+-> note one thing, the data type integer -> double in preprocess.
 
 ---
 
