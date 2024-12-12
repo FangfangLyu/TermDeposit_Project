@@ -8,6 +8,8 @@ import java.util.Random;
 
 import com.termdeposit.model.DataContainer;
 import com.termdeposit.model.RandomForest;
+import com.termdeposit.model.Tree;
+
 
 
 public class Main {
@@ -38,7 +40,6 @@ public class Main {
         DataContainer.KNN knn = data.new KNN();
         RandomForest forest = new RandomForest(data,42);
 
-
         String trainingSetPath = "data/fake2.csv";
         
         data.preprocessData(trainingSetPath, false);
@@ -49,11 +50,16 @@ public class Main {
             System.out.println(data.getTrainingData());
             System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
             System.out.println("RandomForest-------------");
-
             System.out.println(forest.getRandomTrainingSubset(2,2));
 
+            Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
+            treeInstance.setDatatype(data.getFeatureAfterTrain());
+            treeInstance.growTree();
+
+
+
         }catch(Exception e){
-            System.out.println("Knn failed.");
+            System.out.println(" failed.");
             e.printStackTrace(); // Prints the exception and the call stack
         }
 

@@ -5,11 +5,11 @@ public class TreeNode {
     private boolean isResultNode;
     private boolean result;
 
-    private float impurity;
+    private double impurity;
     private String splitFeatureName;
     private boolean isNumFeature;
-    private TreeNode left = null;
-    private TreeNode right = null;
+    private TreeNode left;
+    private TreeNode right;
     private Threshold threshold;
 
     public TreeNode() {
@@ -22,6 +22,7 @@ public class TreeNode {
     }
 
     public void setResult(boolean r) {
+        isResultNode = true;
         result = r;
     }
 
@@ -29,11 +30,11 @@ public class TreeNode {
         return isResultNode;
     }
 
-    public float getImpurity(){
+    public double getImpurity(){
         return impurity;
     }
 
-    public void setImpurity(float imp) {
+    public void setImpurity(double imp) {
         impurity = imp;
     }
 

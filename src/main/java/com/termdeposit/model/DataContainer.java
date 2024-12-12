@@ -331,7 +331,7 @@ public class DataContainer {
                         LinkedHashSet<String> uniqueValues = DataContainer.this.oneHotkeyValues.get(feature);
                         for (String uniqueValue : uniqueValues) {
                             String newFeatureName = feature + "_" + uniqueValue;
-                            if (feature.equals("ID") || feature.equals("id")) {
+                            if (feature.equals("ID") || feature.equals("id") || feature.equals("y")) {
                                 transformedRow.put(feature, value);
                                 DataContainer.this.featureDatatype_afterTrain.put(feature, "String");
                             }else{
@@ -461,12 +461,12 @@ public class DataContainer {
             
             // Iterate through features to construct Weka attributes(after the one hot key)
             for (String feature : this.featureList.keySet()) {
-                if ("String".equals(this.featureList.get(feature))) {
+                if ("String".equals(this.featureList.get(feature)) && !feature.equals("y") ) {
                     //handle categorical
                     for (String uniqueValue : DataContainer.this.oneHotkeyValues.get(feature)) {
                         this.attributes.add(new Attribute(feature + "_" + uniqueValue)); //because after one hot encoding, the categorical attributes get expanded.
                     }
-                } else if ("Integer".equals(this.featureList.get(feature)) || "Double".equals(this.featureList.get(feature))) {
+                } else {
                     //handle numeric features
                     this.attributes.add(new Attribute(feature));
                 }
@@ -644,9 +644,9 @@ public class DataContainer {
 
                 System.out.println("Before update: " + originalRow);
 
-
+                /* */
                 for (String uniqueValue : DataContainer.this.oneHotkeyValues.get("y")) {
-                    newRow.put("y_" + uniqueValue, y.equals(uniqueValue)? 1.0: 0.0); //because after one hot encoding, the categorical attributes get expanded.
+                    newRow.put("y" ,y); //because after one hot encoding, the categorical attributes get expanded.
                 }
 
 

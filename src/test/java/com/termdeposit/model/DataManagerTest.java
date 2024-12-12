@@ -90,7 +90,7 @@ public class DataManagerTest {
             }
             data.add(row);
         }
-
+        System.out.println(data);
         return data;
     }
 
