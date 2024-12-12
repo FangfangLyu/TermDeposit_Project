@@ -1,3 +1,5 @@
+package com.termdeposit.view;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.List;
@@ -79,7 +81,5 @@ public class UserView extends JFrame{
         setVisible(true);
     }
 
-    public static void main (String[] args) {
-        new UserView();
-    }
+
 }

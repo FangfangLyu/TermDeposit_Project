@@ -71,15 +71,16 @@ public class Tree {
     
         if (node.isLeaf()) {
             // If it's a leaf node, print its label
-            System.out.println("Leaf: " + node.getThreshold().toString());
+            System.out.println("Leaf: " + "Result: "+ node.getResult());
         } else {
             // If it's an internal node, print feature and threshold
+            System.out.println("Impurity: " + node.getImpurity() );
             System.out.println("Feature: " + node.getFeatName() + " <= " + node.getThreshold().toString());
-            System.out.println("Left Child: ");
+            System.out.println("Left Child: (result:)"+node.isLeaf());
             // Recursively print the left child
             printTreeRecursive(node.getLeft(), level + 1);
             
-            System.out.println("Right Child: ");
+            System.out.println("Right Child: (result) "+node.isLeaf());
             // Recursively print the right child
             printTreeRecursive(node.getRight(), level + 1);
         }
@@ -89,7 +90,7 @@ public class Tree {
         //need code;
         this.featureDataType.remove("ID");
         TreeNode initialNode = new TreeNode();
-        grow(1, initialNode, featureDataType,trainingData);
+        grow(1, initialNode, featureDataType,trainingData,1);
         System.out.println("Tree grown");
 
         root = initialNode;
@@ -97,9 +98,10 @@ public class Tree {
     }
 
 
-    public void grow(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData) {
+    public void grow(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity) {
         // Initialize the best impurity, best threshold, and best splits
         double minImpurity = 1;
+        String bestType = null;
 
         HashMap<String, Threshold> min = new HashMap<>();
         List<HashMap<String, Object>> trainingDataLeft_final = new ArrayList<>();
@@ -107,10 +109,11 @@ public class Tree {
     
         Object result_threshold_value = null;
         boolean featureTypeIsNum = false;
-        boolean isLeftNull=true, isRightNull = true;
+
+        boolean isLeftNull=true, isRightNull=true;
 
         boolean conditionForResult = (remainingTrainingData.size() < this.treeMinSampleSplit) 
-                                    || treeMaxLayer <= layer || remainingFeatures.size() <= 1; //only ID column remains
+                                    || treeMaxLayer <= layer || remainingFeatures.size() <= 1 || inputImpurity == 0; //only ID column remains
 
         if( (conditionForResult)){
             int yesCount = 0;
@@ -124,6 +127,9 @@ public class Tree {
                 }
             }
             currentNode.setResult(yesCount>noCount);
+            currentNode.setLeft(null);
+            currentNode.setLeft(null);
+
             System.out.println("result node.");
             return;
         }
@@ -136,14 +142,13 @@ public class Tree {
             This requires more design and thinking, due to time constraint, out goal is to create a running prototype first. 
             */
             for (String feature : remainingFeatures.keySet()) {
-
                 boolean isLeftNull_temp=true, isRightNull_temp = true; 
 
                 // Skip ID or target column (y)
                 if (feature.equals("ID") || feature.equals("y")) {
                     continue;
                 }
-                System.out.println("String feature:"+feature);
+                System.out.println("**String feature:"+feature);
 
     
                 // Get the data type of the feature
@@ -165,6 +170,7 @@ public class Tree {
 
                 Object compareTo = null;
     
+                    //////////////////////////
                 if (type.equals("String")) {
                     // Handling categorical features (String type)
                     for (HashMap<String, Object> point : remainingTrainingData) {
@@ -177,42 +183,35 @@ public class Tree {
                             //calculate the right branch's impurity
                             trainingDataRight.add(point);
                             if (point.get("y").equals("yes")) {
-                                System.out.println("Right got a yes");
                                 rightYes++;
                             }else{
                                 rightNo++;
-                                System.out.println("Right got a no");
 
                             }
                         } else {
-                            isRightNull_temp = false;
+                            isLeftNull_temp = false;
                             //calculate the right branch's impurity
                             trainingDataLeft.add(point);
                             if (point.get("y").equals("yes")) {
                                 leftYes++;
-                                System.out.println("Left got a yes");
-
                             }else{
                                 leftNo++;
-                                System.out.println("Left got a no");
-
                             }
                         }
                     }
 
                     System.out.println("Size of left data:"+trainingDataLeft.size());
+                    System.out.println("Size of right data:"+trainingDataRight.size());
     
                     // Calculate Gini Impurity for both splits
                     double leftGini;
                     double rightGini;
-                    System.out.println("Left is null condition " + isLeftNull_temp);
-
-                    System.out.println("Right is null condition " + isRightNull_temp);
+                    System.out.println("~NULL Left :" + isLeftNull_temp);
+                    System.out.println("~NULL Right : " + isRightNull_temp);
 
                     if(isLeftNull_temp){
                         leftGini = 1;
-                        System.out.println("Left is null " + isRightNull_temp);
-
+                        System.out.println("Left is null " + isLeftNull_temp);
                     }else{
                         leftGini = 1 - Math.pow( ((double)leftYes )/ trainingDataLeft.size(), 2) - Math.pow(((double) leftNo) / trainingDataLeft.size(), 2);
 
@@ -228,7 +227,6 @@ public class Tree {
                     System.out.println("Left Gini" + leftGini);
                     System.out.println("Right Gini" + rightGini);
 
-
                     // Weighted Gini Impurity for the split
                     currentImpurity = (trainingDataLeft.size() / (double) dataSize) * leftGini + (trainingDataRight.size() / (double) dataSize) * rightGini;
                     
@@ -241,17 +239,20 @@ public class Tree {
 
                     HashMap<String, Threshold> min_local = new HashMap<>();
                     double localMinImpurity_best = 1;
+
                     //Object result_threshold_value_best = null;
 
                     List<HashMap<String, Object>> trainingDataLeft_best= new ArrayList<>();
                     List<HashMap<String, Object>> trainingDataRight_best = new ArrayList<>();
                 
                     boolean isNullLeft_localBest=true, isNullRight_localBest=true;
-    
+                    Object local_compareTo = null;
+
                     for (int i = 0; i < testNum; i++) {
+                        Object comparedNum;
                         int randomIndex = random.nextInt(dataSize);
-                        compareTo = remainingTrainingData.get(randomIndex).get(feature);
-                        System.out.println("CompareTo for numerical: "+ compareTo);
+                        comparedNum = remainingTrainingData.get(randomIndex).get(feature);
+                        System.out.println("CompareTo for numerical: "+ comparedNum);
                         
                         boolean isNullLeft_local=true, isNullRight_local=true;
                             
@@ -267,8 +268,8 @@ public class Tree {
                         // Split data based on the threshold value
                         for (HashMap<String, Object> point : remainingTrainingData) {
                             Threshold temp = new Threshold(point.get(feature), type);
-                            if (temp.compare((Double)compareTo)) {
-                                isNullLeft_local = false;
+                            if (temp.compare((Double)comparedNum)) {
+                                isNullRight_local = false;
 
                                 trainingDataRight_local.add(point);
                                 if (point.get("y").equals("yes")) {
@@ -320,10 +321,12 @@ public class Tree {
     
                         // Weighted Gini Impurity for this test split
                         double testImpurity = (trainingDataLeft_local.size() / (double) dataSize) * leftGini + (trainingDataRight_local.size() / (double) dataSize) * rightGini;
-        
+                        System.out.println("Weighted Impurity: "+ testImpurity+"****");
+
                         if(testImpurity==0.0 || testImpurity < localMinImpurity_best){
                             //featureTypeIsNum = true;
                             //First make this the local best
+                            local_compareTo = comparedNum;
                             localMinImpurity_best = currentImpurity;
                             trainingDataLeft_best = new ArrayList<>(trainingDataLeft_local);
                             trainingDataRight_best = new ArrayList<>(trainingDataRight_local);
@@ -340,16 +343,27 @@ public class Tree {
                             }
                         }
                     }
+                    trainingDataLeft = trainingDataLeft_best;
+                    trainingDataRight = trainingDataRight_best;
+
                     isLeftNull_temp = isNullLeft_localBest;
                     isRightNull_temp = isNullRight_localBest;
+                    bestType = type;
+
+                    compareTo = local_compareTo;
+                    currentImpurity = localMinImpurity_best;
+
                 }
-                //for both data type same handling
+                //for both data type same handling: String anf Number, where the variable sued in following are all saved under the same name.
                 if(currentImpurity==0){
-                    featureTypeIsNum = false;
+                    if(bestType.equals("String")){
+                        featureTypeIsNum = false;
+                    }else{
+                        featureTypeIsNum = true;
+                    }
                     minImpurity = currentImpurity;
-                    result_threshold_value = compareTo;
-                    trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
-                    trainingDataRight_final = new ArrayList<>(trainingDataRight);
+                    trainingDataLeft_final = trainingDataLeft;
+                    trainingDataRight_final = trainingDataRight;
                     min.clear();
                     if(featureTypeIsNum){
                         min.put(feature, new Threshold((Double)compareTo, type));
@@ -359,23 +373,29 @@ public class Tree {
 
                     }
                     isLeftNull = isLeftNull_temp;
-                    isRightNull = isLeftNull_temp;
+                    isRightNull = isRightNull_temp;
                     break;
                 }
                 // Update the best split if the current split has lower impurity
                 if (currentImpurity < minImpurity) {
-                    featureTypeIsNum = false;
+
+                    isLeftNull = isLeftNull_temp;
+                    isRightNull = isRightNull_temp;
+
                     minImpurity = currentImpurity;
-                    trainingDataLeft_final = new ArrayList<>(trainingDataLeft);
-                    trainingDataRight_final = new ArrayList<>(trainingDataRight);
+                    trainingDataLeft_final = trainingDataLeft;
+                    trainingDataRight_final = trainingDataRight;
+
                     min.clear();
                     if(featureTypeIsNum){
                         min.put(feature, new Threshold((Double)compareTo, type));
 
                     }else{
                         min.put(feature, new Threshold(compareTo.toString(), type));
-
                     }
+
+                    isLeftNull = isLeftNull_temp;
+                    isRightNull = isRightNull_temp;
                 }
             }
         }
@@ -388,29 +408,27 @@ public class Tree {
         remainingFeatures.remove(featureName);
         System.out.println(remainingFeatures);
 
+
         if(!isLeftNull){
             TreeNode leftChild = new TreeNode();        
             System.out.println("Left is not null.");
 
-            if(isRightNull){
-                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final);
-                System.out.println("leftChild grown for " + currentNode );
-            }else{
-                grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final);
-                System.out.println("leftChild grown not result " + currentNode );
-            }
+            grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final, minImpurity);
+            System.out.println("leftChild grown not result " + currentNode );
+
             printIndentation(layer);
             System.out.print("Left child of the current Node:" + leftChild);
             currentNode.setLeft(leftChild);
-
+        }else{
+            currentNode.setLeft(null);
         }
         if(!isRightNull){
             TreeNode rightChild = new TreeNode();        
             currentNode.setRight(rightChild);
-            if(isLeftNull){
-                grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final);
-                System.out.println("rightChild grown for " + currentNode );
-            }
+            grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final, minImpurity);
+            System.out.println("rightChild grown for " + currentNode );
+        }else{
+            currentNode.setLeft(null);
         }
         
 

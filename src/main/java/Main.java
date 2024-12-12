@@ -9,6 +9,7 @@ import java.util.Random;
 import com.termdeposit.model.DataContainer;
 import com.termdeposit.model.RandomForest;
 import com.termdeposit.model.Tree;
+import com.termdeposit.view.UserView;
 
 
 
@@ -55,25 +56,21 @@ public class Main {
             Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
             treeInstance.growTree();
-            
+
             System.out.println("Tree-------------");
 
             treeInstance.printTree();
 
-
+            //new UserView();
 
         }catch(Exception e){
-            System.out.println(" failed.");
+            System.out.println(" Main: something failed.");
             e.printStackTrace(); // Prints the exception and the call stack
         }
 
-        System.out.println(data.testMatchTestLabel("data/test.csv", "data/test_label.csv"));
+        System.out.println("Test file and test label size matched: "+data.testMatchTestLabel("data/test.csv", "data/test_label.csv"));
         
-
-        //System.out.println(data.gettrainingDataWithMissing());
-
-
-
     }
+        //System.out.println(data.gettrainingDataWithMissing());
 }
 
