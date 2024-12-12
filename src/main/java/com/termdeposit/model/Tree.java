@@ -1,6 +1,7 @@
 package com.termdeposit.model;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Tree {
     private TreeNode root;
@@ -38,13 +39,47 @@ public class Tree {
         return false;
     }
 
-    public TreeNode growTree(List<HashMap<String,Object>> list){
+    public TreeNode growTree( List<HashMap<String,Object>> list){
         //need code;
+
         return null;
     }
 
-    public HashMap<String,Threshold> findBestThreshold(List<HashMap<String,Object>> trainingData){
+    public TreeNode growRecursive(TreeNode node, List<HashMap<String,Object>> list){
+        return null
+    }
+
+    public HashMap<String,Threshold> findBestThreshold(HashMap<String,String>  remainingFeatures, List<HashMap<String,Object>> trainingData){
         //need code;
+        HashMap<String,Threshold> min;
+        double minImpurity = 1;
+
+        for(String feature: remainingFeatures.keySet()){
+            String type = this.featureDataType.get(feature);
+            if(type.equals("String")){
+                double compareTo = 1.0;
+                int yesSideCounter = 0;
+                Threshold temp;
+
+                //Find the count of instances satisfying the condition
+                for(HashMap<String,Object> point : trainingData){
+                    temp = new Threshold(point.get(feature), type);
+                    yesSideCounter += temp.compare(compareTo) ? 1:0 ;
+                }
+                int noSideCounter = trainingData.size() - yesSideCounter;
+                //Find Gini Impurity:
+                double currentImpurity = 1 - ( ((double)yesSideCounter)/trainingData.size() - ((double)noSideCounter)/trainingData.size()); 
+                if(currentImpurity < minImpurity) {
+                    minImpurity = currentImpurity;
+                    
+
+                }
+
+                //find the impurity when if the attribute is true. and remove this feature
+            }else{
+
+            }
+        }
         return null;
     }
 
