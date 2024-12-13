@@ -6,11 +6,13 @@ import java.util.List;
 import java.io.File;
 
 public class UserView extends JFrame{
-    private JButton button;
     private JLabel label;
     private JMenu file, functions;
     private JMenuBar menuBar;
     private JMenuItem input,exit,predict,calc;
+
+    private JFrame calcScreen;
+    private JButton calcGrowth, calcMinGain;
 
     private int serviceInputCount;
     private List inputUI;
@@ -56,6 +58,33 @@ public class UserView extends JFrame{
         calc.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 label.setText("Calc Pressed");
+                calcScreen = new JFrame();
+                calcScreen.setTitle("Deposit Growth Calculator");
+                calcScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                calcScreen.setSize(300,200);
+                calcScreen.setLayout(null);
+
+                calcGrowth = new JButton("Growth");
+                calcGrowth.setBounds(100,50,100,30);
+                calcScreen.add(calcGrowth);
+
+                calcGrowth.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        label.setText("calcGrowth Clicked");
+                    }
+                });
+
+                calcMinGain = new JButton("Minimum Gain");
+                calcMinGain.setBounds(100,50,100,30);
+                calcScreen.add(calcMinGain);
+
+                calcMinGain.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        label.setText("calcMinGain Clicked");
+                    }
+                });
+
+                calcScreen.setVisible(true);
             }
         });
 
@@ -63,19 +92,11 @@ public class UserView extends JFrame{
         functions.add(calc);
         menuBar.add(functions);
 
-        button = new JButton("temp");
-        button.setBounds(100,50,100,30);
-        add(button);
-
         label = new JLabel("temp");
         label.setBounds(100,100,100,30);
         add(label);
 
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                label.setText("Button Clicked");
-            }
-        });
+       
 
         setJMenuBar(menuBar);
         setVisible(true);
