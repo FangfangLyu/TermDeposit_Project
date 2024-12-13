@@ -15,6 +15,12 @@ public class TreeNode {
         this.left = null;
         this.right = null;
         this.isNumFeature = false;
+
+        this.result = false;
+        this.impurity = 1.0;
+        this.splitFeatureName = "";
+        
+
     }//constructor
 
     public boolean getResult() {

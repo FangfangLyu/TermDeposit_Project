@@ -1,9 +1,13 @@
 package com.termdeposit.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class Tree {
     private TreeNode root;
@@ -28,23 +32,56 @@ public class Tree {
     }
 
     public boolean predictPreorderTraversal(HashMap<String,Object> predictionInput){
-        return false;
+        return traverse(root,predictionInput);
         
     }
     public boolean traverse(TreeNode current, HashMap<String,Object> predictionInput){
-        if(!current.isLeaf()){ //if not result node
+        if (!current.isLeaf()) {
             String feature = current.getFeatName();
             Threshold valueObj = current.getThreshold();
+            System.out.println("Testing "+feature);
             Object inputValue = predictionInput.get(feature);
-            if(valueObj.compare(inputValue)){
-                traverse(current.getRight(),predictionInput);
+            System.out.println("Input value "+inputValue);
+
+            String type = featureDataType.get(feature);
+            System.out.println("Input type "+type);
+
+
+            if(type.equals("String")){
+                if (valueObj.compare(inputValue.toString())) {
+                    if(current.getRight()!=null){
+                        return traverse(current.getRight(), predictionInput);
+                    }else{
+                        return false;
+                    }
+                } else {
+                    if(current.getRight()!=null){
+                        return traverse(current.getLeft(), predictionInput);
+                    }else{
+                        return true;
+                    }
+                }
             }else{
-                traverse(current.getLeft(), predictionInput);
+                if (valueObj.compare((double)inputValue)) {
+                    if(current.getLeft()!=null){
+                        return traverse(current.getRight(), predictionInput);
+                    }else{
+                        return false;
+                    }
+                } else {
+                    if(current.getLeft()!=null){
+                        return traverse(current.getLeft(), predictionInput);
+                    }else{
+                        return false;
+                    }
+                }
             }
-        }else{
-            return current.getResult();
+
+        } else {
+            System.out.println("Leaf reached.");
+
+            return current.getResult();  // Return the predicted result at the leaf node
         }
-        return false;
     }
 
     // Helper method to print indentation based on tree depth
@@ -61,42 +98,95 @@ public class Tree {
     // Recursive method to print the tree
     private void printTreeRecursive(TreeNode node, int level) {
         if (node == null) {
+            printIndentation(level);
             System.out.println("Node is null");
 
             return; // Base case: if the node is null, do nothing
         }
         
         // Print the current node with indentation based on tree level
-        printIndentation(level);
     
         if (node.isLeaf()) {
             // If it's a leaf node, print its label
-            System.out.println("Leaf: " + "Result: "+ node.getResult());
+            printIndentation(level);
+            System.out.println("Impurity: " + node.getImpurity());
+            printIndentation(level);
+            System.out.println("Leaf " + "Result: "+ node.getResult());
         } else {
             // If it's an internal node, print feature and threshold
+            printIndentation(level);
+            System.out.println("IsLeaf: " + node.isLeaf() );
+
+            printIndentation(level);
             System.out.println("Impurity: " + node.getImpurity() );
+            printIndentation(level);
             System.out.println("Feature: " + node.getFeatName() + " <= " + node.getThreshold().toString());
-            System.out.println("Left Child: (result:)"+node.isLeaf());
+            printIndentation(level);
+            printIndentation(level);
+
+            System.out.println("Left Child:");
             // Recursively print the left child
             printTreeRecursive(node.getLeft(), level + 1);
-            
-            System.out.println("Right Child: (result) "+node.isLeaf());
+
+            printIndentation(level);
+
+            System.out.println("Right Child: ");
             // Recursively print the right child
             printTreeRecursive(node.getRight(), level + 1);
         }
     }
 
-    public TreeNode growTree(){
+    public TreeNode growTree(int featureNum){
         //need code;
         this.featureDataType.remove("ID");
         TreeNode initialNode = new TreeNode();
-        grow(1, initialNode, featureDataType,trainingData,1);
+        grow(1, initialNode, selectRandomFeatures(featureNum),trainingData,1);
         System.out.println("Tree grown");
 
         root = initialNode;
         return root;
     }
+    public TreeNode growTree(HashMap<String,String> featureList){
 
+        //need code;
+        //TODO: has bug here, intend for testing, but report error when using a featureList. 
+        //Code has to be modified
+        //this.featureDataType.remove("ID");
+        TreeNode initialNode = new TreeNode();
+        grow(1, initialNode, featureList, trainingData,1);
+        System.out.println("Tree grown");
+
+        root = initialNode;
+
+        return root;
+    }
+
+    public HashMap<String, String>  selectRandomFeatures(int num){
+        HashMap<String, String> selectedFeatures = new HashMap<>();
+
+
+        // Define the list of keys to exclude
+        Set<String> excludedKeys = new HashSet<>(Arrays.asList("ID", "y"));
+
+        // Convert the featureDataType map entries into a list
+        List<Map.Entry<String, String>> entries = new ArrayList<>();
+        for (Map.Entry<String, String> entry : featureDataType.entrySet()) {
+            if (!excludedKeys.contains(entry.getKey())) {
+                entries.add(entry);
+            }
+        }
+
+        num = Math.min(num, entries.size());
+
+        for (int i = 0; i < num; i++) {
+            int randomIndex = random.nextInt(entries.size());
+            Map.Entry<String, String> randomEntry = entries.get(randomIndex);
+            selectedFeatures.put(randomEntry.getKey(), randomEntry.getValue());
+            entries.remove(randomIndex); // Remove to avoid duplicates
+        }
+
+        return selectedFeatures;
+    }
 
     public void grow(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity) {
         // Initialize the best impurity, best threshold, and best splits
@@ -111,6 +201,8 @@ public class Tree {
         boolean featureTypeIsNum = false;
 
         boolean isLeftNull=true, isRightNull=true;
+
+        double leftImpurity=1, rightImpurity=1;
 
         boolean conditionForResult = (remainingTrainingData.size() < this.treeMinSampleSplit) 
                                     || treeMaxLayer <= layer || remainingFeatures.size() <= 1 || inputImpurity == 0; //only ID column remains
@@ -152,7 +244,7 @@ public class Tree {
 
     
                 // Get the data type of the feature
-                String type = this.featureDataType.get(feature);
+                String type = remainingFeatures.get(feature);
                 int dataSize = remainingTrainingData.size();
     
                 double currentImpurity = 1; // Initialize the impurity for this feature
@@ -168,13 +260,15 @@ public class Tree {
                 int leftYes = 0, leftNo = 0, rightYes = 0, rightNo = 0;
                 //speical handling needed if any side is empty
 
+                double lImpurity =1, rImpurity = 1;
+
                 Object compareTo = null;
     
                     //////////////////////////
                 if (type.equals("String")) {
                     // Handling categorical features (String type)
                     for (HashMap<String, Object> point : remainingTrainingData) {
-                        compareTo = point.get(feature); // The threshold is the category value
+                        compareTo = 1.0; // The threshold is the category value
                         Threshold temp = new Threshold(point.get(feature).toString(), type);
     
                         // Split data based on comparison
@@ -184,8 +278,14 @@ public class Tree {
                             trainingDataRight.add(point);
                             if (point.get("y").equals("yes")) {
                                 rightYes++;
+                                System.out.println("Comapred to " + temp.getValue());
+                                System.out.println("Right got a yes");
+
                             }else{
                                 rightNo++;
+                                System.out.println("Comapred to " + temp.getValue());
+                                System.out.println("Right got a No");
+
 
                             }
                         } else {
@@ -194,8 +294,16 @@ public class Tree {
                             trainingDataLeft.add(point);
                             if (point.get("y").equals("yes")) {
                                 leftYes++;
+                                System.out.println("Comapred to " + temp.getValue());
+
+                                System.out.println("left got a yes");
+
                             }else{
                                 leftNo++;
+                                System.out.println("Comapred to " + temp.getValue());
+
+                                System.out.println("left got a no");
+
                             }
                         }
                     }
@@ -214,7 +322,6 @@ public class Tree {
                         System.out.println("Left is null " + isLeftNull_temp);
                     }else{
                         leftGini = 1 - Math.pow( ((double)leftYes )/ trainingDataLeft.size(), 2) - Math.pow(((double) leftNo) / trainingDataLeft.size(), 2);
-
                     }
                     if(isRightNull_temp){
                         rightGini = 1;
@@ -223,6 +330,9 @@ public class Tree {
                         rightGini = 1 - Math.pow((double) rightYes / trainingDataRight.size(), 2) - Math.pow((double) rightNo / trainingDataRight.size(), 2);
 
                     }
+
+                    lImpurity = leftGini;
+                    rImpurity = rightGini;
 
                     System.out.println("Left Gini" + leftGini);
                     System.out.println("Right Gini" + rightGini);
@@ -248,11 +358,24 @@ public class Tree {
                     boolean isNullLeft_localBest=true, isNullRight_localBest=true;
                     Object local_compareTo = null;
 
+                    HashSet<Double> visitedDoubles = new HashSet<>();
+
+
                     for (int i = 0; i < testNum; i++) {
                         Object comparedNum;
+
+                         
                         int randomIndex = random.nextInt(dataSize);
                         comparedNum = remainingTrainingData.get(randomIndex).get(feature);
                         System.out.println("CompareTo for numerical: "+ comparedNum);
+
+
+                        if (!visitedDoubles.contains((Double)comparedNum)) {
+                            // Process value2 as it hasn't been visited
+                            visitedDoubles.add((Double)comparedNum);
+                        }else{
+                            continue;
+                        }
                         
                         boolean isNullLeft_local=true, isNullRight_local=true;
                             
@@ -274,9 +397,12 @@ public class Tree {
                                 trainingDataRight_local.add(point);
                                 if (point.get("y").equals("yes")) {
                                     local_rightYes++;
+                                    System.out.println("Comapred to " + point.get(feature));
+
                                     System.out.println("Right got a yes");
                                 }else{
                                     local_rightNo++;
+                                    System.out.println("Comapred to " + point.get(feature));
                                     System.out.println("Right got a no");
 
                                 }
@@ -284,40 +410,46 @@ public class Tree {
                                 isNullLeft_local = false;
                                 trainingDataLeft_local.add(point);
                                 if (point.get("y").equals("yes")) {
-                                    leftYes++;
+                                    local_leftYes++;
+                                    System.out.println("Comapred to " + point.get(feature));
                                     System.out.println("Left got a yes");
     
                                 }else{
-                                    leftNo++;
+                                    local_leftNo++;
+                                    System.out.println("Comapred to " + point.get(feature));
                                     System.out.println("Left got a no");
     
                                 }
                             }
                         }
-    
+                        System.out.println("Size of Right data:"+trainingDataRight_local.size());
+
                         System.out.println("Size of left data:"+trainingDataLeft_local.size());
     
                         // Calculate Gini Impurity for both splits
                         double leftGini;
                         double rightGini;
-                        System.out.println("Left is null condition " + isNullLeft_local);
-                        System.out.println("Right is null condition " + isNullRight_local);
                             
                         if(isNullLeft_local){
                             leftGini = 1;
-                            System.out.println("Left is null " + isNullRight_local);
+                            System.out.println("Left is null " + isNullLeft_local);
 
                         }else{
                             leftGini = 1 - Math.pow((double) local_leftYes / trainingDataLeft_local.size(), 2) - Math.pow((double) local_leftNo / trainingDataLeft_local.size(), 2);
 
                         }
-                        if(isRightNull_temp){
+                        if(isNullRight_local){
                             rightGini = 1;
                             System.out.println("Right is null " + isNullRight_local);
                         }else{
                             rightGini = 1 - Math.pow((double) local_rightYes / trainingDataRight_local.size(), 2) - Math.pow((double) local_rightNo / trainingDataRight_local.size(), 2);
 
                         }
+
+
+                        System.out.println("Left Gini" + leftGini);
+                        System.out.println("Right Gini" + rightGini);
+
     
                         // Weighted Gini Impurity for this test split
                         double testImpurity = (trainingDataLeft_local.size() / (double) dataSize) * leftGini + (trainingDataRight_local.size() / (double) dataSize) * rightGini;
@@ -326,6 +458,8 @@ public class Tree {
                         if(testImpurity==0.0 || testImpurity < localMinImpurity_best){
                             //featureTypeIsNum = true;
                             //First make this the local best
+                            lImpurity = leftGini;
+                            rImpurity = rightGini;
                             local_compareTo = comparedNum;
                             localMinImpurity_best = currentImpurity;
                             trainingDataLeft_best = new ArrayList<>(trainingDataLeft_local);
@@ -355,12 +489,17 @@ public class Tree {
 
                 }
                 //for both data type same handling: String anf Number, where the variable sued in following are all saved under the same name.
-                if(currentImpurity==0){
+                if(currentImpurity==0.0){
+                    bestType = type;
+                    System.out.println(feature+" - Feature datatype:"+bestType);
+
                     if(bestType.equals("String")){
                         featureTypeIsNum = false;
                     }else{
                         featureTypeIsNum = true;
                     }
+                    leftImpurity = lImpurity;
+                    rightImpurity = rImpurity;
                     minImpurity = currentImpurity;
                     trainingDataLeft_final = trainingDataLeft;
                     trainingDataRight_final = trainingDataRight;
@@ -378,6 +517,10 @@ public class Tree {
                 }
                 // Update the best split if the current split has lower impurity
                 if (currentImpurity < minImpurity) {
+                    bestType = type;
+
+                    leftImpurity = lImpurity;
+                    rightImpurity = rImpurity;
 
                     isLeftNull = isLeftNull_temp;
                     isRightNull = isRightNull_temp;
@@ -401,7 +544,11 @@ public class Tree {
         }
         //define the node here
         currentNode.setImpurity(minImpurity);
+
+        System.out.println(min);
+
         String featureName = min.keySet().iterator().next();
+
         currentNode.setFeatName(featureName, featureTypeIsNum);
         currentNode.setThreshold(min.get(featureName));
         // Recursively set the left and right children of the current node 
@@ -413,7 +560,7 @@ public class Tree {
             TreeNode leftChild = new TreeNode();        
             System.out.println("Left is not null.");
 
-            grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final, minImpurity);
+            grow(layer+1, leftChild, remainingFeatures, trainingDataLeft_final, leftImpurity);
             System.out.println("leftChild grown not result " + currentNode );
 
             printIndentation(layer);
@@ -425,7 +572,7 @@ public class Tree {
         if(!isRightNull){
             TreeNode rightChild = new TreeNode();        
             currentNode.setRight(rightChild);
-            grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final, minImpurity);
+            grow(layer+1, rightChild, remainingFeatures, trainingDataRight_final, rightImpurity);
             System.out.println("rightChild grown for " + currentNode );
         }else{
             currentNode.setLeft(null);

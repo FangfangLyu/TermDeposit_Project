@@ -1,5 +1,5 @@
 ID,age,job,marital,education,y
 
 1,29,technician,single,tertiary,no
-,40,,single,tertiary,no
+,40,,single,tertiary,yes
 3,40,cashier,single,tertiary,yes
