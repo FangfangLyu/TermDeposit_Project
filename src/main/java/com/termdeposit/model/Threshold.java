@@ -54,7 +54,7 @@ public class Threshold {
     public boolean subNumericGivenStrictlyGreater(Object featureValue) {
         if ((type.equals("Integer")||type.equals("Double"))) {
             System.out.println("Number featurevalue in threadhold:"+featureValue);
-            return ((Number) featureValue).doubleValue() >= ((Number) value).doubleValue();
+            return ((Number) featureValue).doubleValue() <= ((Number) value).doubleValue();
         }
         return false;
     }

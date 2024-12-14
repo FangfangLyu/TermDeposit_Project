@@ -24,7 +24,7 @@ public class Main {
         dataTypeMap.put("job", "String");          // Job is a categorical feature (String)
         dataTypeMap.put("marital", "String");      // Marital status is a categorical feature (String)
         dataTypeMap.put("education", "String");    // Education level is a categorical feature (String)
-        /*dataTypeMap.put("default", "String");     // Default is a binary feature (Boolean)
+        dataTypeMap.put("default", "String");     // Default is a binary feature (Boolean)
         dataTypeMap.put("balance", "Double");       // Balance is a continuous numerical value (Float)
         dataTypeMap.put("housing", "String");     // Housing is a binary feature (Boolean)
         dataTypeMap.put("loan", "String");        // Loan is a binary feature (Boolean)
@@ -53,36 +53,49 @@ public class Main {
             System.out.println("RandomForest-------------");
             System.out.println(forest.getRandomTrainingSubset(2,2));
 
-            Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
+            Tree treeInstance = new Tree(2,5, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
 
 
 
             HashMap<String,String> selectedFeatures = new HashMap<>();
             selectedFeatures.put("job_technician", "String");
-            selectedFeatures.put("balance", "Double");
             selectedFeatures.put("age", "Integer");
+            selectedFeatures.put("balance", "Double");
 
-            treeInstance.growTree(3);
-
-            //treeInstance.growTree(selectedFeatures); //TODO: This is probably needed for Test cases to run
             //treeInstance.growTree(3);
 
+            System.out.println(treeInstance.growTree(selectedFeatures)); //TODO: This is probably needed for Test cases to run
+            //treeInstance.growTree(selectedFeatures);
+
             System.out.println("Tree-------------");
-            treeInstance.printTree();
+            //treeInstance.printTree();
 
-            HashMap<String, Object> predictInput = new HashMap<>();
-        
-            predictInput.put("ID", 1);
-            predictInput.put("age", 29);
-            predictInput.put("job", "cashier");
-            predictInput.put("marital", "single");
-            predictInput.put("education", "tertiary");
-            predictInput.put("y", "no");
-
-            predictInput= knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(predictInput));            
+            HashMap<String, Object> inputData = new HashMap<>();
             
-            System.out.printf("%s: %b\n",predictInput.toString(),treeInstance.predictPreorderTraversal(predictInput));
+            inputData.put("ID", "1");
+            inputData.put("age", 42);
+            inputData.put("job", "technician");
+            inputData.put("marital", "single");
+            inputData.put("education", "primary");
+            inputData.put("default", "yes");
+            inputData.put("balance", 10000.0);
+            inputData.put("housing", "yes");
+            inputData.put("loan", "yes");
+            inputData.put("contact", "cellular");
+            inputData.put("day", 4);
+            inputData.put("month", "jun");
+            inputData.put("campaign", 1);
+            inputData.put("pdays", 2);
+            inputData.put("previous", 14);
+            inputData.put("poutcome", "unknown");
+            inputData.put("y", "yes");
+    
+            //predictInput.put("y", "no");
+
+            inputData= knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
+            
+            System.out.printf("%s: %b\n",inputData.toString(),treeInstance.predictPreorderTraversal(inputData));
             
 
 
