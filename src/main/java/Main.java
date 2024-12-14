@@ -41,6 +41,7 @@ public class Main {
         DataContainer.KNN knn = data.new KNN();
         RandomForest forest = new RandomForest(data,42);
 
+
         String trainingSetPath = "data/fake2.csv";
         
         data.preprocessData(trainingSetPath, false);
@@ -53,7 +54,7 @@ public class Main {
             System.out.println("RandomForest-------------");
             System.out.println(forest.getRandomTrainingSubset(2,2));
 
-            Tree treeInstance = new Tree(2,5, new Random(42), data.getTrainingData());
+            /*Tree treeInstance = new Tree(2,5, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
 
 
@@ -70,6 +71,7 @@ public class Main {
 
             System.out.println("Tree-------------");
             //treeInstance.printTree();
+            */
 
             HashMap<String, Object> inputData = new HashMap<>();
             
@@ -95,8 +97,13 @@ public class Main {
 
             inputData= knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
             
-            System.out.printf("%s: %b\n",inputData.toString(),treeInstance.predictPreorderTraversal(inputData));
+            //System.out.printf("%s: %b\n",inputData.toString(),treeInstance.predictPreorderTraversal(inputData));
             
+            forest.growTreeForest();
+
+            System.out.printf("%s: %b\n",inputData.toString(), forest.randomForestPrediction(inputData));
+
+            forest.randomForestPrediction(inputData);
 
 
             //new UserView();

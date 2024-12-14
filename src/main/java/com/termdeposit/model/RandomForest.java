@@ -26,6 +26,7 @@ public class RandomForest {
         this.dataContainer = dataContainer; // Set the reference to DataManager
         //this.treeFeatureSelectCount = treeFeatureCount;
         this.random = new Random(randomSeed); // Initialize Random with a seed
+        this.forest = new ArrayList<>();
 
     }
 
@@ -53,32 +54,33 @@ public class RandomForest {
     }
     
 
-    /*  TODO: Random feature selection subset 
+    /*  TODO: Random feature selection subset (completed in Tree class)
     (not applicable, but it might be a good thing to include in future 
     when trainingData is converted back from one hot encoding to numbers and Strings)
     due to time constraint at this points, I decide to leave it out of our way first.
     */
-        private List randomFeatureSelectionSubset(int featureSize) {
+    private List randomFeatureSelectionSubset(int featureSize) {
         // Implement logic to select random features
         return null; // Placeholder
     }
 
     // Grow a single tree by calling this method, which this method will activate the  corresponding method in the Tree class
-    public Tree growTreeInitial(List<List<HashMap<String, Object>>> trainingData) {
+    public Tree growTreeInitial( List<HashMap<String, Object>> trainingData) {
         // Implement logic to grow an initial tree
-        Tree tree = new Tree();
+        Tree tree = new Tree(trainingData);
         tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
-        tree.growTree(trainingData);
+        //tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
+        tree.growTree(treeFeatureSelectCount); //number of random features to split on
         return tree;
     }
 
     // Intiates to grow all trees by calling this method, which this underying method will activate the corresponding method in the Tree class
     public void growTreeForest() {
-
         for (List<HashMap<String, Object>> subset : randomSubsets) {
+            getRandomTrainingSubset(treeNum,treeSubsetSize); //TEMP HYPERPARAMETER
             // Grow a tree for each subset
             Tree tree = growTreeInitial(subset);
-            forest.add(tree);  // Add the tree to the forest
+            forest.add(tree); // Add the tree to the forest
         }
 
     }

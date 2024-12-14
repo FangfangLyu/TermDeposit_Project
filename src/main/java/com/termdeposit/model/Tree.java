@@ -21,6 +21,15 @@ public class Tree {
 
     private Random random;
 
+
+    public Tree(List<HashMap<String,Object>> trainingData2){
+        this.treeMinSampleSplit = 2;
+        this.treeMaxLayer = 5;
+        this.root = null;
+        this.random = new Random(42);
+        this.trainingData = trainingData2;
+    }
+
     public Tree(int treeMinSampleSplit, int treeMaxLayer, Random random, List<HashMap<String,Object>> trainingData){
         this.treeMinSampleSplit = treeMinSampleSplit;
         this.treeMaxLayer = treeMaxLayer;
