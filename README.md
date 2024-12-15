@@ -1,6 +1,6 @@
 # TermDeposit_Project
 
-# Assignment 0: Term Deposit Potential Investor Prediction Proposal
+# Term Deposit Potential Investor Prediction Proposal
 
 ## Group Members from Queens College 
 ### Software Engineering Course (Fall 2024)
