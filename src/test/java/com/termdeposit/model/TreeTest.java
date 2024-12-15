@@ -6,6 +6,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 public class TreeTest {
+    
     @Test
     public void TreeGrow(){
         
@@ -32,7 +33,7 @@ public class TreeTest {
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
-        RandomForest forest = new RandomForest(data,42,100,500,5,20,5);
+        RandomForest forest = new RandomForest(data,42,100,5,20,5);
 
         String trainingSetPath = "test/fakeTrain.csv";
         
