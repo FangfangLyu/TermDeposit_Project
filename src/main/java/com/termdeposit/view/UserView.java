@@ -6,6 +6,8 @@ import java.util.List;
 import java.io.File;
 
 public class UserView extends JFrame{
+    private JButton openButton;
+    private JFileChooser fileChooser;
     private JLabel label;
     private JMenu file, functions;
     private JMenuBar menuBar;
@@ -20,7 +22,7 @@ public class UserView extends JFrame{
     public UserView() {
         setTitle("Term Deposit Predictor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300,200);
+        setSize(800,600);
         setLayout(null);
 
         menuBar = new JMenuBar();
@@ -30,7 +32,29 @@ public class UserView extends JFrame{
         input = new JMenuItem("Input");
         input.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                label.setText("File Open");
+
+                openButton = new JButton("Select a CSV File");
+                openButton.setBounds(100,100,150,50);
+                openButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        fileChooser = new JFileChooser();
+                        fileChooser.setDialogTitle("Select a CSV File");
+                        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
+
+                        int userSelectedFile = fileChooser.showOpenDialog(null);
+                        if(userSelectedFile == JFileChooser.APPROVE_OPTION) {
+                            File csvFile = fileChooser.getSelectedFile();
+                            if(csvFile.getName().toLowerCase().endsWith(".csv")) {
+                                //process csvFile using manager class
+                            }
+                            else {
+                                JOptionPane.showMessageDialog(null, "Please select a valid CSV file.", "Invalid File", JOptionPane.ERROR_MESSAGE);
+                            }
+
+                        }
+                    }
+                });
+                add(openButton);
             }
         });
 
@@ -75,7 +99,7 @@ public class UserView extends JFrame{
                 });
 
                 calcMinGain = new JButton("Minimum Gain");
-                calcMinGain.setBounds(100,50,100,30);
+                calcMinGain.setBounds(100,100,100,30);
                 calcScreen.add(calcMinGain);
 
                 calcMinGain.addActionListener(new ActionListener() {
@@ -92,8 +116,8 @@ public class UserView extends JFrame{
         functions.add(calc);
         menuBar.add(functions);
 
-        label = new JLabel("temp");
-        label.setBounds(100,100,100,30);
+        label = new JLabel("");
+        label.setBounds(100,50,100,30);
         add(label);
 
        
