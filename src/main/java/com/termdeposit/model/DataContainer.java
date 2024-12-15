@@ -34,10 +34,6 @@ public class DataContainer {
     private List<HashMap<String, Object>> testingData;
 
     private HashMap<String, Object> predictionInput;
-    private List<HashMap<String, Object>> addServiceOptions;
-
-    private float minGain;
-    private boolean hasMinGain;
 
     public DataContainer(HashMap<String, String> featureDatatype) {
         /**
@@ -73,9 +69,7 @@ public class DataContainer {
 
         this.testingData = new ArrayList<>();
         this.predictionInput = new HashMap<>();
-        this.addServiceOptions = new ArrayList<>();
-        this.minGain = 0.0f;
-        this.hasMinGain = false;
+
         this.isTrained = false;
     }
 
