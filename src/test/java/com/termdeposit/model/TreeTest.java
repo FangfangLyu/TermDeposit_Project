@@ -32,20 +32,21 @@ public class TreeTest {
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
-        RandomForest forest = new RandomForest(data,42);
+        RandomForest forest = new RandomForest(data,42,100,500,5,20,5);
 
         String trainingSetPath = "test/fakeTrain.csv";
         
-        data.preprocessData(trainingSetPath, false);
-        try{
+        try{        
+            data.preprocessData(trainingSetPath, false);
+
             knn.train();
-            data.getTrainingData().addAll(knn.imputeMissingTrainingValues(data.gettrainingDataWithMissing()));
+            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing()));
             System.out.println(data.getTrainingData());
             System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
             System.out.println("RandomForest-------------");
-            System.out.println(forest.getRandomTrainingSubset(2,2));
+            System.out.println(forest.getRandomTrainingSubset());
 
-            Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
+            Tree treeInstance = new Tree(2,3, data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
             
             HashMap<String,String> selectedFeatures = new HashMap<>();

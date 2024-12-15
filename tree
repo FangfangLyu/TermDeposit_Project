@@ -1,0 +1,11 @@
+
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 1.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}

@@ -29,11 +29,18 @@ public class DataContainer {
     // ArrayList later.
     private List<HashMap<String, Object>> trainingData;
 
+
     private List<HashMap<String, Object>> trainingDataWithMissing; // TODO: NEW
 
-    private List<HashMap<String, Object>> testingData;
+    private List<HashMap<String,Object>> testingData;
 
-    private HashMap<String, Object> predictionInput;
+    private KNN knn_model = null;
+    
+    private HashMap<String,Object> predictionInput; 
+    private List<HashMap<String,Object>> addServiceOptions; 
+
+    private float minGain;
+    private boolean hasMinGain;
 
     public DataContainer(HashMap<String, String> featureDatatype) {
         /**
@@ -73,7 +80,7 @@ public class DataContainer {
         this.isTrained = false;
     }
 
-    public void preprocessData(String trainingSetUrl, boolean isTesting) {
+    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting) throws Exception{
         /**
          * Preprocess a dataset from a file.
          *
@@ -129,30 +136,87 @@ public class DataContainer {
         }
         // Above step parse the input file
         preprocessData(data, isTesting);
-        this.trainingData = data;
+        if(!isTesting){
+            this.trainingData = data;
+        }
+        return data;
 
     }
 
-    public void preprocessData(List<HashMap<String, Object>> inputs, boolean isTesting) {
-        // if this object has never trainined yet, this should be preprocessing training
-        // data
+    public List<HashMap<String, Object>> preprocessData(String[] headers, List<String> inputStringList, boolean isTesting) throws Exception{
+        /**
+         * Preprocess a dataset from a file.
+         *
+         * @param trainingSet Path to the dataset.
+         * @param isTesting Flag indicating if this is testing data.
+         * @return A HashMap containing preprocessed data.
+         */
+        List<HashMap<String, Object>> data = new ArrayList<>();
+
+
+        // Parse each subsequent line as a row of data
+        for (int i = 1; i < inputStringList.size(); i++) {
+            String[] values = inputStringList.get(i).split(",");
+            HashMap<String, Object> row = new HashMap<>();
+            for (int j = 0; j < headers.length; j++) {
+                if (j < values.length) {
+                    if (values[j].isEmpty()) {
+                        row.put(headers[j], null); // Assign null if the value is empty
+                    } else {
+                        row.put(headers[j], values[j]); // Assign the actual value if not empty
+                    }
+                } else {
+                    row.put(headers[j], null); // If no value for the header, assign null
+                }
+            }
+            data.add(row);
+        }
+        // Above step parse the input file
+        data = preprocessData(data, isTesting);
+        if(!isTesting){
+            this.trainingData = data;
+        }
+        return data;
+
+    }
+
+
+    public List<HashMap<String, Object>> preprocessData(List<HashMap<String,Object>> inputs, boolean isTesting) throws Exception{
+        //if this object has never trainined yet, this should be preprocessing training data
+        List<HashMap<String,Object>> output = new ArrayList<>();
+
         Iterator<HashMap<String, Object>> iterator = inputs.iterator();
+        List<HashMap<String, Object>> rowsToFill = new ArrayList<>();
 
         while (iterator.hasNext()) {
             HashMap<String, Object> row = iterator.next();
-            try {
-                preprocessSingleData(row);
-            } catch (IllegalArgumentException e) {
-                // TODO: Possible enhancement here is to create custom Exceptions.
+            try{
+                preprocessSingleData(row); //the reference is passed
+            }catch (IllegalArgumentException e) {
+                // TODO: Possible enhancement here is to create custom Exceptions. 
                 // Handle the error gracefully
                 if (e.getMessage().equals("Fill")) {
-                    System.out.println("missing once");
-                    this.trainingDataWithMissing.add(row);
+                    if(!isTesting){
+                        System.out.println("missing once");
+                        this.trainingDataWithMissing.add(row);
+                        iterator.remove();
+                    }else{
+                        System.out.println("Testing missing value. find and fill.");
+                        HashMap<String, Object> filledRow = knn_nearestSearch(row);
+                        iterator.remove();
+                        inputs.add(filledRow);  // Add the modified row back into the list
+                    }
                 }
-                iterator.remove();
             }
-
         }
+        return inputs;
+
+    }
+
+    public HashMap<String,Object> knn_nearestSearch(HashMap<String, Object> input) throws Exception{
+        List<HashMap<String,Object>> input_list = new ArrayList<HashMap<String,Object>>();
+        input_list.add(this.knn_model.oneHotkeyEncodingForSingle(input));
+        return this.knn_model.imputeMissingValues(input_list).get(0);
     }
 
     public HashMap<String, Object> preprocessSingleData(HashMap<String, Object> row) {
@@ -306,6 +370,12 @@ public class DataContainer {
     public HashMap<String, String> getFeatureAfterTrain() {
         return this.featureDatatype_afterTrain;
     }
+
+    public void setKnn(KNN knn){
+        //Have to set up knn after data is trained.
+        this.knn_model = knn;
+    }
+
 
     public HashMap<String, Object> getPredictionInput() { // TODO: NEW
         return this.predictionInput;
@@ -542,7 +612,7 @@ public class DataContainer {
         }
 
         // Perform KNN imputation for missing values in the dataset
-        public List<HashMap<String, Object>> imputeMissingTrainingValues(List<HashMap<String, Object>> missingData)
+        public List<HashMap<String, Object>> imputeMissingValues(List<HashMap<String, Object>> missingData)
                 throws Exception {
 
             List<HashMap<String, Object>> encodedData = this.oneHotkeyEncoding(missingData);
