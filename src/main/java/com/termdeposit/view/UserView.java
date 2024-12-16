@@ -12,16 +12,16 @@ import java.io.File;
 
 public class UserView extends JFrame {
     // new
-    // buttons for user to select if they want to train model on default dataset
-    // or on their own dataset via csv file
-    private JButton trainDefaultButton, trainCustomButton;
-    private JLabel instructionsLabel;
-    private JButton predictionButton;
-    private JButton addServiceButton;
 
     // CardLayout object to allow switching between panels (screens)
     private CardLayout cardLayout;
-    private JPanel mainPanel
+    private JPanel mainPanel;
+
+    // screens to be switched out
+    private JPanel mainScreen;
+    private JPanel trainScreen;
+    private JPanel predictScreen;
+    private JPanel addServiceScreen;
 
     // old
     // private JButton openButton;
@@ -43,38 +43,44 @@ public class UserView extends JFrame {
         setSize(800, 600);
         setLayout(new BorderLayout());
 
-        // set up buttons and labels
-        this.trainDefaultButton = new JButton("Train Model from Default Dataset");
-        this.trainCustomButton = new JButton("Train Model from Custom Dataset");
-        this.instructionsLabel = new JLabel(
-                "Select an option to train a model off of our Kaggle dataset or your own dataset.", JLabel.CENTER);
-
         // set up cardlayout and main screen (screens will switch out on this)
         this.cardLayout = new CardLayout();
         this.mainPanel = new JPanel();
 
         // set up four screens that will be switched out when needed
-        mainPanel.add(createMainScreen(), "MainScreen");
-        mainPanel.add(createTrainScreen(), "TrainScreen");
-        mainPanel.add(createPredictScreen(), "PredictScreen");
-        mainPanel.add(createAddServiceScreen(), "AddServiceScreen");
+        this.mainScreen = createMainScreen();
+        this.trainScreen = createTrainScreen();
+        this.predictScreen = createPredictScreen();
+        this.addServiceScreen = createAddServiceScreen();
 
-        // set up panel to hold buttons
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1, 2));
-        panel.add(trainDefaultButton);
-        panel.add(trainCustomButton);
+        mainPanel.add(mainScreen, "MainScreen");
+        mainPanel.add(trainScreen, "TrainScreen");
+        mainPanel.add(predictScreen, "PredictScreen");
+        mainPanel.add(addServiceScreen, "AddServiceScreen");
 
-        // add panel and instructions to JFrame
-        add(panel, BorderLayout.CENTER);
-        add(instructionsLabel, BorderLayout.NORTH);
+        add(mainPanel);
+
+        cardLayout.show(mainPanel, "MainScreen");
     }
 
     private JPanel createMainScreen() {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel instructionLabel = new JLabel("Welcome to Term Deposit Predictor.\nPlease select an option.",
+                JLabel.CENTER);
+        JButton trainButton = new JButton("Train Model");
+        trainButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, "TrainScreen");
+            }
+        });
 
+        panel.add(instructionLabel, BorderLayout.NORTH);
+        panel.add(trainButton, BorderLayout.CENTER);
+
+        return panel;
     }
 
-    private JPanel createTrainScreen() {
+    private JPanel createTrainScreen(Manager manager) {
 
     }
 
@@ -86,6 +92,11 @@ public class UserView extends JFrame {
 
     }
 
+    // TODO: update render() function in class diagram to this instead
+    public void updateMainScreen(boolean allowPrediction, boolean allowAddService) {
+
+    }
+
     // add action listener methods for buttons
     public void addTrainDefaultListener(ActionListener actionListener) {
         trainDefaultButton.addActionListener(actionListener);
@@ -94,19 +105,6 @@ public class UserView extends JFrame {
     public void addTrainCustomListener(ActionListener actionListener) {
         // actionListener should trigger upload operation
         trainCustomButton.addActionListener(actionListener);
-    }
-
-    // TODO: update render() in class diagram
-    public void render(String message, boolean allowPrediction, boolean allowAddService) {
-        this.instructionsLabel = new JLabel(message);
-
-        if (allowPrediction) {
-            this.predictionButton = new JButton("Start Prediction");
-        }
-
-        if (allowAddService) {
-            this.addServiceButton = new JButton("Additional Service");
-        }
     }
 
     // menuBar = new JMenuBar();
