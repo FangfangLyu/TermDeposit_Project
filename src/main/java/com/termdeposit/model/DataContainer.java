@@ -18,18 +18,18 @@ import weka.core.neighboursearch.LinearNNSearch;
 import weka.core.neighboursearch.NearestNeighbourSearch;
 
 public class DataContainer {
-    private HashMap<String, String> featureDatatype; // TODO: For assignement 2, reflect the variable name changed from
-                                                     // inputDatatype to featureDatatype
+    private HashMap<String, String> featureDatatype;
+
     private HashMap<String, String> featureDatatype_afterTrain;
 
-    private HashMap<String, LinkedHashSet<String>> oneHotkeyValues; // TODO: NEW
-    private boolean isTrained; // TODO: NEW
+    private HashMap<String, LinkedHashSet<String>> oneHotkeyValues;
+    private boolean isTrained;
 
     // Note: Array is an interface, can not be instantiated, but it can store
     // ArrayList later.
     private List<HashMap<String, Object>> trainingData;
 
-    private List<HashMap<String, Object>> trainingDataWithMissing; // TODO: NEW
+    private List<HashMap<String, Object>> trainingDataWithMissing;
 
     private List<HashMap<String, Object>> testingData;
 
