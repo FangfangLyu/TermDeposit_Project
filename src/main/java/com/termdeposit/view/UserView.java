@@ -3,11 +3,14 @@ package com.termdeposit.view;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import com.termdeposit.controller.Manager;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
 import java.awt.event.*;
 import java.util.List;
+import java.util.HashMap;
 import java.io.File;
 
 public class UserView extends JFrame {
@@ -69,6 +72,7 @@ public class UserView extends JFrame {
                 JLabel.CENTER);
         JButton trainButton = new JButton("Train Model");
         trainButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, "TrainScreen");
             }
@@ -81,7 +85,55 @@ public class UserView extends JFrame {
     }
 
     private JPanel createTrainScreen(Manager manager) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2, 1, 10, 15));
 
+        JButton trainDefaultButton = new JButton("Train From Default CSV");
+        trainDefaultButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String trainingSetPath = "data/train.csv";
+                try {
+                    // TODO: fill out training on default here
+                    manager.startImputation(rootPaneCheckingEnabled, trainingSetPath);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Training model failed.");
+                    ex.printStackTrace();
+                }
+            }
+
+        });
+
+        JButton trainCustomButton = new JButton("Train From Upload CSV");
+        trainCustomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HashMap<String, String> featureDatatype = manager.getFeatureList();
+                String message = createFieldMessage(featureDatatype);
+
+                JOptionPane.showMessageDialog(null, "CSV file should contain the following fields:\n" + message,
+                        "CSV header information", JOptionPane.INFORMATION_MESSAGE);
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Select a CSV file for training");
+
+                int result = fileChooser.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File trainingSetPath = fileChooser.getSelectedFile();
+                    try {
+                        // TODO: put logic here for training model off of the file
+
+                    }
+                    // TODO: add multiple catch blocks for specific error spaces
+                    catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private JPanel createPredictScreen() {
@@ -95,6 +147,15 @@ public class UserView extends JFrame {
     // TODO: update render() function in class diagram to this instead
     public void updateMainScreen(boolean allowPrediction, boolean allowAddService) {
 
+    }
+
+    private static String createFieldMessage(HashMap<String, String> featureDatatype) {
+        StringBuilder builder = new StringBuilder();
+
+        for (HashMap.Entry<String, String> entry : featureDatatype.entrySet()) {
+            builder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        return builder.toString();
     }
 
     // add action listener methods for buttons

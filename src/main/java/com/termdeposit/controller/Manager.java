@@ -8,6 +8,8 @@ import com.termdeposit.view.UserView;
 
 import weka.knowledgeflow.Data;
 
+import java.util.HashMap;
+
 public class Manager {
     private AdditionalService additionalService;
 
@@ -19,18 +21,20 @@ public class Manager {
     private int multiprocessCPUCount;
 
     public Manager() {
-        this.additionalService = new AdditionalService();
+        this.additionalService = null;
         this.randomForest = null;
         this.data = null;
-        this.view = new UserView();
+        this.view = null;
 
-        view.add()
     }
 
-    public void startView() {
-        this.view
+    public void startImputation(boolean isUserData, String trainingSetPath) {
+        this.data.preprocessData(trainingSetPath, isUserData);
     }
 
+    public HashMap<String, String> getFeatureList() {
+        return this.data.getFeatureList();
+    }
     // public void bootstrapBuildRandomForest() {
 
     // }
