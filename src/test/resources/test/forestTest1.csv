@@ -1,0 +1,12 @@
+ID,age,job,marital,education,default,balance,housing,loan,contact,day,month,campaign,pdays,previous,poutcome,y
+
+1,40,technician,single,tertiary,no,40000,no,no,cellular,11,may,2,-1,0,unknown,yes
+2,27,technician,married,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+3,55,technician,single,tertiary,no,20000,no,no,cellular,11,may,2,-1,0,unknown,yes
+4,21,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+5,20,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no
+6,40,technician,single,tertiary,no,40000,no,no,cellular,11,may,2,-1,0,unknown,yes
+7,27,technician,married,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+8,55,technician,single,tertiary,no,20000,no,no,cellular,11,may,2,-1,0,unknown,yes
+9,21,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+10,20,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no

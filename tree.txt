@@ -1,0 +1,901 @@
+
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.38506825242919906,
+  splitFeatureName: poutcome_success,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3793619644381206,
+  splitFeatureName: contact_unknown,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.42703568587901275,
+  splitFeatureName: housing_no,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.36435222569654097,
+  splitFeatureName: month_oct,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.35961578051017173,
+  splitFeatureName: month_jun,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.35291477374810715,
+  splitFeatureName: month_mar,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3490890041061237,
+  splitFeatureName: month_sep,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3457123078516054,
+  splitFeatureName: marital_married,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3884088477706832,
+  splitFeatureName: campaign,
+  isNumFeature: false,
+  threshold: Threshold{value=6.0, type='Integer'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3969458983520639,
+  splitFeatureName: month_jan,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4026265437423562,
+  splitFeatureName: age,
+  isNumFeature: false,
+  threshold: Threshold{value=30.0, type='Integer'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4425486536923487,
+  splitFeatureName: day,
+  isNumFeature: false,
+  threshold: Threshold{value=24.0, type='Integer'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.42126472135298254,
+  splitFeatureName: pdays,
+  isNumFeature: false,
+  threshold: Threshold{value=342.0, type='Integer'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4515240280620833,
+  splitFeatureName: marital_divorced,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4409841846838293,
+  splitFeatureName: month_nov,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4344974397330418,
+  splitFeatureName: contact_telephone,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4500537386764931,
+  splitFeatureName: month_feb,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4372290712692262,
+  splitFeatureName: job_management,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.423888888888889,
+  splitFeatureName: job_blue-collar,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3837719298245615,
+  splitFeatureName: education_unknown,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.38781163434903054,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.42995169082125606,
+  splitFeatureName: loan_yes,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4395085066162571,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.375,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.4151260504201681,
+  splitFeatureName: month_may,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.3428571428571429,
+  splitFeatureName: month_jul,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.48979591836734704,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.38095238095238093,
+  splitFeatureName: balance,
+  isNumFeature: false,
+  threshold: Threshold{value=114.0, type='Double'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4444444444444444,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.45714285714285724,
+  splitFeatureName: job_housemaid,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.46153846153846156,
+  splitFeatureName: job_entrepreneur,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.44871794871794857,
+  splitFeatureName: poutcome_unknown,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.48611111111111094,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.38461538461538464,
+  splitFeatureName: job_admin.,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4166666666666667,
+  splitFeatureName: month_apr,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4,
+  splitFeatureName: job_self-employed,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4,
+  splitFeatureName: education_tertiary,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.5,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.375,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.17060931899641593,
+  splitFeatureName: job_services,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.10752688172043007,
+  splitFeatureName: poutcome_other,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.1515151515151516,
+  splitFeatureName: education_primary,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.1590909090909091,
+  splitFeatureName: job_technician,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.20833333333333326,
+  splitFeatureName: previous,
+  isNumFeature: false,
+  threshold: Threshold{value=4.0, type='Integer'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.25,
+  splitFeatureName: education_secondary,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.375,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.4666666666666667,
+  splitFeatureName: poutcome_failure,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4444444444444444,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.5,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.4738863287250385,
+  splitFeatureName: contact_cellular,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4444444444444444,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.45329670329670335,
+  splitFeatureName: job_student,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.47268673355629875,
+  splitFeatureName: loan_no,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4444444444444444,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.4763705103969754,
+  splitFeatureName: default_no,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: null,
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: true,
+  impurity: 0.4763705103969754,
+  splitFeatureName: default_yes,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.3858096085409253,
+  splitFeatureName: month_dec,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.386995753715499,
+  splitFeatureName: job_retired,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: false,
+  result: false,
+  impurity: 0.385815253100092,
+  splitFeatureName: month_aug,
+  isNumFeature: false,
+  threshold: Threshold{value=1.0, type='String'},
+  left: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.38415785024760596,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4066453284560281,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4444444444444444,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.0,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.17685505574778926,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.2519470699432893,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.3145213509924314,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.45674740484429066,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.42000000000000004,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.48,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.3693827160493828,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.4745026798390198,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: false,
+  impurity: 0.22273501047516886,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+},
+  right: 
+TreeNode {
+  isResultNode: true,
+  result: true,
+  impurity: 0.25375582087461934,
+  splitFeatureName: ,
+  isNumFeature: false,
+  threshold: null,
+  left: null,
+  right: null
+}
+}
