@@ -18,15 +18,17 @@ public class Manager {
     // TODO: for multiprocessing, 2.0
     private int multiprocessCPUCount;
 
-    public Manager(AdditionalService additionalService, RandomForest randomForest, DataContainer data, UserView view) {
-        this.additionalService = additionalService;
-        this.randomForest = randomForest;
-        this.data = data;
-        this.view = view;
+    public Manager() {
+        this.additionalService = new AdditionalService();
+        this.randomForest = null;
+        this.data = null;
+        this.view = new UserView();
+
+        view.add()
     }
 
     public void startView() {
-
+        this.view
     }
 
     // public void bootstrapBuildRandomForest() {

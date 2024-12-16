@@ -33,7 +33,6 @@ public class DataContainer {
 
     private List<HashMap<String, Object>> testingData;
 
-    private List<HashMap<String,Object>> testingData;
 
     
     private KNN knn_model = null;
