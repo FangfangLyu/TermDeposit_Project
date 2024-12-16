@@ -53,4 +53,4 @@ dkms.conf
 
 #sample files
 /Users/fangfang/Downloads/weka-example-master
-/Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/target
+target/

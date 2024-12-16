@@ -1,7 +1,6 @@
 package com.termdeposit.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +9,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-public class TreeTest {
+public class TreeNodeTest {
 
     @Test
     public void TreeGrow(){
@@ -39,7 +38,6 @@ public class TreeTest {
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
         Tree tree = new Tree(2,5,data.getTrainingData()); //reference passed
-        RandomForest forest = new RandomForest(data,42,100,5,20,5);
 
         String trainingSetPath = "test/treeTest1.csv";
         
@@ -49,45 +47,21 @@ public class TreeTest {
             knn.train();
             data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
 
-            Tree treeInstance = new Tree(2,3, data.getTrainingData());
-            treeInstance.setDatatype(data.getFeatureAfterTrain());
-            
             LinkedHashMap<String,String> selectedFeatures = new LinkedHashMap<>();
             selectedFeatures.put("job_technician", "String");
             selectedFeatures.put("balance", "Double");
             selectedFeatures.put("age", "Integer");
 
-            treeInstance.growTree(3);
-            // public SplitResult findBestThreshold(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity){
+            //treeInstance.growTree(3);
+               // public SplitResult findBestThreshold(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity){
 
-            System.out.println("******TEST::*****");
+            TreeNode resultRoot = new TreeNode();
+            SplitResult result = tree.findBestThreshold(1, resultRoot,selectedFeatures, data.getTrainingData(), 1);
 
-            //Arrange: Input data (all fields filled)
-            HashMap<String, Object> inputData = new HashMap<>();
-            inputData.put("ID", "1");
-            inputData.put("age", 42);
-            inputData.put("job", "technician");
-            inputData.put("marital", "single");
-            inputData.put("education", "secondary");
-            inputData.put("default", "yes");
-            inputData.put("balance", 10000.0);
-            inputData.put("housing", "yes");
-            inputData.put("loan", "yes");
-            inputData.put("contact", "cellular");
-            inputData.put("day", 4);
-            inputData.put("month", "jun");
-            inputData.put("campaign", 1);
-            inputData.put("pdays", 2);
-            inputData.put("previous", 14);
-            inputData.put("poutcome", "unknown");
+            System.out.println(result);
+            assertEquals("job_technician", result.getFeatureName());
+            assertEquals("1.0", result.getThreshold().getValue().toString());
 
-            inputData = knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
-
-
-            System.out.println("Tree-------------");
-
-            treeInstance.printTree();
-            assertTrue(true==treeInstance.predictPreorderTraversal(inputData));
 
             //new UserView();
 

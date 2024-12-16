@@ -33,6 +33,13 @@ public class Validation {
         List<HashMap<String,Object>> insample_inputs = this.data.getTrainingData();
         int size = 1000;
         int count = 0;
+
+        // Local instances for counts within each batch
+        int batchTruePositive = 0;
+        int batchFalsePositive = 0;
+        int batchTrueNegative = 0;
+        int batchFalseNegative = 0;
+
          // Iterate through each HashMap in the List
         for (HashMap<String, Object> row : insample_inputs) {
             // Get the value of key "y"
@@ -61,15 +68,20 @@ public class Validation {
             }
             count++;
             if(count%size==0 || count == insample_inputs.size()){
-                printResult();
+                //printResult();
             }
 
         }
-        
+        printResult();        
 
     }
 
     public void getTestAccuracy (String testFile, String testLabel) throws Exception{
+        //re initialize them from 0
+        true_positive = 0;
+        false_positive = 0 ;
+        true_negative = 0;
+        false_negative = 0;
 
         // Read all lines from the file
         InputStream testInputStream = getClass().getClassLoader().getResourceAsStream(testFile);
@@ -84,12 +96,15 @@ public class Validation {
         int batchSize = 1000;  // Process in chunks of 1000 lines
         
         if (testInputStream == null || testLabelInputStream == null) {
-            System.err.println("File not found!");
+            System.err.println("File not found");
         } else {
             // Wrap the InputStream in an InputStreamReader and BufferedReader
             BufferedReader testInputReader = new BufferedReader(new InputStreamReader(testInputStream));
-            BufferedReader testLabelInputReader = new BufferedReader(new InputStreamReader(testInputStream));
+            BufferedReader testLabelInputReader = new BufferedReader(new InputStreamReader(testLabelInputStream));
+
             String header = testInputReader.readLine(); //consume the header
+            String header2 = testLabelInputReader.readLine(); //consume the header no use
+
             String[] headers = header.split(",");
 
 
@@ -99,23 +114,29 @@ public class Validation {
                     if (!inputLine.trim().isEmpty() & !labelLine.trim().isEmpty()) {
                         inputLines.add(inputLine);
                         labelLines.add(labelLine);
+                        //System.out.println(labelLine);
                     }
 
                     // If we've read 1000 lines (batch size), process them
                     if (inputLines.size() == batchSize) {
+                        System.out.println("Size test "+ inputLines.size()+" label size "+ labelLines.size());
                         List<HashMap<String,Object>> testInput_form = processBatch(headers, inputLines, labelLines);
                         List<Boolean> labelBooleanList = processLabelBatch(labelLines);
 
                         inputLines.clear();  // Clear the list for the next batch
                         labelLines.clear();
-                        pauseForProcessing(testInput_form,labelBooleanList);  // Pause for further processing
+                        System.out.println("Size test: "+ testInput_form.size() + " LabelBooleanList: "+ labelBooleanList.size());
+                        pauseForProcessing(testInput_form,labelBooleanList);  // Pause sfor further processing
                     }
                 }
 
                 // Process any remaining lines if they're fewer than 1000
                 if (!inputLines.isEmpty()) {
-                    //processBatch(headers, inputLines, labelLines);
+                    processBatch(headers, inputLines, labelLines);
                 }
+
+                printResult();
+
                 
                 // Close the readers
                 testInputReader.close();
@@ -128,18 +149,24 @@ public class Validation {
     }
 
     private List<HashMap<String,Object>> processBatch(String[] headers, List<String> inputLines, List<String> labelLines) throws Exception {
+        this.data.setKnn(knn_model);
         List<HashMap<String,Object>> processedInput = this.data.preprocessData(headers, inputLines, true);
-        return processedInput;
+        List<HashMap<String,Object>> onehot = this.knn_model.oneHotkeyEncoding(processedInput);
+        return onehot;
     }
+
     //TODO: Should use Id to map, should read the whole label file, and process the test block by block
     public List<Boolean> processLabelBatch(List<String> labelLines) {
         List<Boolean> processedLabels = new ArrayList<>();
 
         for (String line : labelLines) {
-            String[] parts = line.split(",");            
+            String[] parts = line.split(",");      
+            //System.out.println("Row: : " + line);
+      
             // Check if the line has exactly 2 parts (ID and label)
             if (parts.length == 2) {
                 String label = parts[1].trim().toLowerCase(); // Normalize to lowercase
+                //System.out.println("line with two label in test Label: " + line);
 
                 // Process the label
                 if ("yes".equals(label)) {
@@ -153,7 +180,7 @@ public class Validation {
                 // Handle malformed lines (e.g., missing comma)
                 processedLabels.add(null); // Or log an error
                 System.out.println("Malformed line: " + line);
-                throw new IllegalArgumentException("invalid test label");
+                throw new IllegalArgumentException("invalid test label not 2 columns");
             }
         }
 
@@ -168,7 +195,9 @@ public class Validation {
         for (int i = 0; i < processedBatch.size(); i++) {
             HashMap<String, Object> point = processedBatch.get(i);
             Boolean Label = labelLines.get(i);
+            //System.out.println(processedBatch.get(0));
             boolean predictedLabel = this.forest.randomForestPrediction(processedBatch.get(i));
+
             if(Label && predictedLabel){
                 //is true and guessed true 
                 this.true_positive++;
@@ -184,7 +213,7 @@ public class Validation {
             }
         }
 
-        printResult();
+        //printResult();
 
         /* 
         // Brief explanations

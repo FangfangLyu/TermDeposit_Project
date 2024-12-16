@@ -23,10 +23,10 @@ public class Threshold {
     }
 
     public boolean compare(Object featureValue){
-        if ((this.type.equals("Integer") || this.type.equals("Double")) && this.value instanceof Number) {
+        if ((this.type.equals("Integer") || this.type.equals("Double")) && this.value instanceof Number && featureValue instanceof Number) {
             return subNumericGivenStrictlyGreater(featureValue); //TODO: I changed the method's name and functionality a bit, but doesn't affect the usage.
             //is the given greater or not
-        } else if (type.equals("String") && value instanceof String) {
+        } else if (type.equals("String") && value instanceof String && featureValue instanceof String) {
             return subCategoryEquivalent(featureValue);
         }else{
             return false;
@@ -37,10 +37,10 @@ public class Threshold {
     // Checks if the featureValue is equivalent for a categorical threshold
     public boolean subCategoryEquivalent(Object featureValue) {
         if (type.equals("String") && featureValue instanceof String) {
-            System.out.println("String featurevalue in threadhold:"+featureValue);
+            //System.out.println("String featurevalue in threadhold:"+featureValue);
             return featureValue.equals(value);
         }else if (type.equals("String") && featureValue instanceof Number) { //due to current implementation all String are expressed in double
-            System.out.println("String in number featurevalue in threadhold:"+featureValue);
+            //System.out.println("String in number featurevalue in threadhold:"+featureValue);
 
             double numericValue = ((Number) value).doubleValue();
             double numericValueGiven = ((Number) featureValue).doubleValue();
@@ -53,7 +53,7 @@ public class Threshold {
     // Checks if a numeric featureValue is greater than the threshold
     public boolean subNumericGivenStrictlyGreater(Object featureValue) {
         if ((type.equals("Integer")||type.equals("Double"))) {
-            System.out.println("Number featurevalue in threadhold:"+featureValue);
+            //System.out.println("Number featurevalue in threadhold:"+featureValue);
             return ((Number) featureValue).doubleValue() <= ((Number) value).doubleValue();
         }
         return false;
@@ -78,6 +78,7 @@ public class Threshold {
         return value.equals(threshold.value) && type.equals(threshold.type);
 
     }
+    
 
 
 

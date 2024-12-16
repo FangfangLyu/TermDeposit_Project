@@ -1,20 +1,21 @@
 package com.termdeposit.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-public class TreeTest {
-
+public class RandomForestTest {
     @Test
-    public void TreeGrow(){
-        
+    public void generateDifferentTrees() throws Exception{
+        //test to see if two trees with different random data will /will not generate different set
+
         HashMap<String, String> dataTypeMap = new HashMap<>();
 
         // Populating the map with column names and their corresponding data types
@@ -39,62 +40,28 @@ public class TreeTest {
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
         Tree tree = new Tree(2,5,data.getTrainingData()); //reference passed
-        RandomForest forest = new RandomForest(data,42,100,5,20,5);
+        RandomForest forest = new RandomForest(data,42,2,2,5,3);
 
-        String trainingSetPath = "test/treeTest1.csv";
+        String trainingSetPath = "test/forestTest1.csv";
         
-        try{        
-            data.preprocessData(trainingSetPath, false);
+        data.preprocessData(trainingSetPath, false);
 
-            knn.train();
-            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+        knn.train();
+        data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+        
+        List<Tree> trees = forest.growTreeForest();
+        System.out.println("0iei12\n"+trees);
+        
+        boolean result = trees.get(0).equals(trees.get(1));            
 
-            Tree treeInstance = new Tree(2,3, data.getTrainingData());
-            treeInstance.setDatatype(data.getFeatureAfterTrain());
-            
-            LinkedHashMap<String,String> selectedFeatures = new LinkedHashMap<>();
-            selectedFeatures.put("job_technician", "String");
-            selectedFeatures.put("balance", "Double");
-            selectedFeatures.put("age", "Integer");
 
-            treeInstance.growTree(3);
+        assertTrue(!result); //if not true
+        
+
+        //treeInstance.growTree(3);
             // public SplitResult findBestThreshold(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity){
 
-            System.out.println("******TEST::*****");
 
-            //Arrange: Input data (all fields filled)
-            HashMap<String, Object> inputData = new HashMap<>();
-            inputData.put("ID", "1");
-            inputData.put("age", 42);
-            inputData.put("job", "technician");
-            inputData.put("marital", "single");
-            inputData.put("education", "secondary");
-            inputData.put("default", "yes");
-            inputData.put("balance", 10000.0);
-            inputData.put("housing", "yes");
-            inputData.put("loan", "yes");
-            inputData.put("contact", "cellular");
-            inputData.put("day", 4);
-            inputData.put("month", "jun");
-            inputData.put("campaign", 1);
-            inputData.put("pdays", 2);
-            inputData.put("previous", 14);
-            inputData.put("poutcome", "unknown");
-
-            inputData = knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
-
-
-            System.out.println("Tree-------------");
-
-            treeInstance.printTree();
-            assertTrue(true==treeInstance.predictPreorderTraversal(inputData));
-
-            //new UserView();
-
-        }catch(Exception e){
-            System.out.println(" Main: something failed.");
-            e.printStackTrace(); // Prints the exception and the call stack
-        }
     }
-    
+
 }

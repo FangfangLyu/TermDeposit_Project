@@ -40,7 +40,6 @@ public class Main {
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
-        RandomForest forest = new RandomForest(data,42,100,5,5,0);
         //RandomForest forest = new RandomForest(data,42,1,5,10,5);
         String trainingSetPath = "data/train.csv";
 
@@ -50,11 +49,10 @@ public class Main {
             data.preprocessData(trainingSetPath, false);
             knn.train();
             knn.saveModel("knn.bin");
-            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing()));
+            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
             System.out.println(data.getTrainingData());
             System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
             System.out.println("RandomForest-------------");
-            System.out.println(forest.getRandomTrainingSubset());
 
             /*Tree treeInstance = new Tree(2,5, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
@@ -75,8 +73,10 @@ public class Main {
             //treeInstance.printTree();
             */
 
-            HashMap<String, Object> inputData = new HashMap<>();
-            
+            RandomForest forest = new RandomForest(data,42,100,5,5,0);
+
+            //HashMap<String, Object> inputData = new HashMap<>();
+            /* 
             inputData.put("ID", "1");
             inputData.put("age", 42);
             inputData.put("job", "technician");
@@ -93,35 +93,34 @@ public class Main {
             inputData.put("pdays", 2);
             inputData.put("previous", 14);
             inputData.put("poutcome", "unknown");
-            inputData.put("y", "yes");
+            inputData.put("y", "yes");*/
     
             //predictInput.put("y", "no");
 
-            inputData= knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
+            //inputData= knn.oneHotkeyEncodingForSingle(data.preprocessSingleData(inputData));            
             
             //System.out.printf("%s: %b\n",inputData.toString(),treeInstance.predictPreorderTraversal(inputData));
             
-
+            //forest.getRandomTrainingSubset();
             /*Tree treeInstance = new Tree(2,5, new Random(42), data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
 
             System.out.println(treeInstance.growTree(3));
 //            System.out.println(treeInstance.predictPreorderTraversal(inputData));*/
-
-
+            
             forest.growTreeForest();
-
-            System.out.printf("%s: %b\n",inputData.toString(), forest.randomForestPrediction(inputData));
+            //System.out.printf("%s: %b\n",inputData.toString(), forest.randomForestPrediction(inputData));
 
             //forest.randomForestPrediction(inputData);
-
-            System.out.println("Accuracy test in sample:");
+            System.out.println("*********Accuracy test in sample:");
             
             Validation tester = new Validation(data, knn, forest); 
-
             tester.getInSampleAccuracy();
-            //tester.getTestAccuracy("test.csv", "test_label.csv");
 
+            //forest.randomForestPrediction(inputData);
+            System.out.println("**********Accuracy test out sample:");
+            
+            tester.getTestAccuracy("data/test.csv", "data/test_label.csv");
 
             //new UserView();
 
@@ -130,7 +129,7 @@ public class Main {
             e.printStackTrace(); // Prints the exception and the call stack
         }
 
-        System.out.println("Test file and test label size matched: "+data.testMatchTestLabel("data/test.csv", "data/test_label.csv"));
+        System.out.println("Test file and test label size matched: " + data.testMatchTestLabel("data/test.csv", "data/test_label.csv"));
         
     }
         //System.out.println(data.gettrainingDataWithMissing());

@@ -40,28 +40,31 @@ public class RandomForest {
         this.minPointToSplit = minPointToSplit;
         this.maxLayer = maxLayer;
         this.treeNum = treeNum;
-        this.treeSubsetSize = Math.max(1, dataContainer.getTrainingData().size() / treeNum);
     }
 
     // Get random training subset
     public List<List<HashMap<String, Object>>> getRandomTrainingSubset( ) {
 
+        this.treeSubsetSize = Math.max(2, dataContainer.getTrainingData().size() / treeNum);
+
         // Implement logic to get the random training subset
-        randomSubsets = new ArrayList<>();
+        //treeSubsetSize = 100; //temp
+        this.randomSubsets = new ArrayList<>();
         List<HashMap<String, Object>>  trainingData = this.dataContainer.getTrainingData(); // Get the training data
 
         for (int i = 0; i < treeNum; i++) {
+            Random treeRandom = new Random(System.currentTimeMillis() + i*5); // Different seed per tree
+
             List<HashMap<String, Object>> shuffledData = new ArrayList<>(trainingData);
-            Collections.shuffle(shuffledData, random);
+            Collections.shuffle(shuffledData, treeRandom);
 
             // Take the first `treeSubsetSize` elements to create the subset
             List<HashMap<String, Object>> subset = shuffledData.subList(0, Math.min(treeSubsetSize, shuffledData.size()));
-            printSubsetIds(subset);
+            //printSubsetIds(subset);
 
             // Add the subset to the list of random subsets
-            randomSubsets.add(new ArrayList<>(subset));
+            this.randomSubsets.add(new ArrayList<>(subset));
         }
-
         return this.randomSubsets; // Placeholder
     }
     
@@ -91,28 +94,36 @@ public class RandomForest {
     }
 
     // Grow a single tree by calling this method, which this method will activate the  corresponding method in the Tree class
-    public Tree growTreeInitial( List<HashMap<String, Object>> trainingData) {
+    public Tree growTreeInitial( List<HashMap<String, Object>> trainingData) throws Exception {
         // Implement logic to grow an initial tree
         Tree tree = new Tree(this.minPointToSplit, this.maxLayer, trainingData);
         tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
         //tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
         String content = tree.growTree(treeFeatureSelectCount).toString(); //number of random features to split on
-        String filename = "./tree";
+        
+        /*String filename = "./tree";
         try (FileWriter fileWriter = new FileWriter(filename)) {
             fileWriter.write(content);
             System.out.println("Successfully wrote to the file: " + filename);
         } catch (IOException e) {
             System.err.println("An error occurred while writing to the file: " + e.getMessage());
-        }
+        }*/
     
-        return tree;
+        if(trainingData.size()!=0 & tree == null){
+            throw new NullPointerException("Error, tree generated is null. ");
+        }else{
+            return tree;
+        }
     }
 
     // Intiates to grow all trees by calling this method, which this underying method will activate the corresponding method in the Tree class
-    public List<Tree> growTreeForest() {
-
+    public List<Tree> growTreeForest() throws Exception {
         getRandomTrainingSubset(); //TEMP HYPERPARAMETER
+
+        System.out.println("This many subsets:  "+ randomSubsets.size() + " generated.");
+
         System.out.println("Random subset of size "+ treeSubsetSize + " generated.");
+
 
         printSubsetIds();
 
@@ -127,11 +138,11 @@ public class RandomForest {
 
     public boolean randomForestPrediction(HashMap<String,Object> onehot_input){
         List<Boolean> results = new ArrayList<>();
-        System.out.println("Result for prediction in a single Tree: begin:");
+        //System.out.println("Result for prediction in a single Tree: begin:");
 
         for(Tree tree : forest){
             boolean predict = tree.predictPreorderTraversal(onehot_input);
-            System.out.println("Result for prediction in a single Tree: " + predict);
+            //System.out.println("Result for prediction in a single Tree: " + predict);
             results.add(predict);
         }
 
@@ -144,13 +155,33 @@ public class RandomForest {
         }
 
         // If the majority of trees predict true, return true, otherwise false
-        System.out.println("Result for true in the predictions of the forest: "+ trueVotes + " / "+ results.size());
+        //System.out.println("Result for true in the predictions of the forest: "+ trueVotes + " / "+ results.size());
 
         return trueVotes > results.size() / 2;
     }
 
     //TODO: we could include store trees and future reference and to avoid retraining the tree
     //But since we currently have it in memory, let's just use it for now.
-
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+    
+        sb.append("Forest{");
+        sb.append("size=").append(forest.size()).append(", ");
+        sb.append("trees=[");
+    
+        for (Tree tree : forest) {
+            sb.append(tree.toString()).append(", ");
+        }
+    
+        // Remove the last comma and space
+        if (!forest.isEmpty()) {
+            sb.setLength(sb.length() - 2);
+        }
+    
+        sb.append("]}");
+    
+        return sb.toString();
+    }
 
 }

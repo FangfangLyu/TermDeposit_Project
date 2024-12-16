@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DataManagerTest {
     //command to run test: mvn -e test
@@ -172,7 +171,7 @@ public class DataManagerTest {
 
 
         knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing());
+        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing(),false);
         instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
@@ -201,7 +200,7 @@ public class DataManagerTest {
 
 
         knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing());
+        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing(),false);
         instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
