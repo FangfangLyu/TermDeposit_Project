@@ -1,6 +1,9 @@
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/Main.java
+/Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/controller/Manager.java
+/Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/AdditionalService.java
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/DataContainer.java
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/RandomForest.java
+/Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/SplitResult.java
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/Threshold.java
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/Tree.java
 /Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/src/main/java/com/termdeposit/model/TreeNode.java

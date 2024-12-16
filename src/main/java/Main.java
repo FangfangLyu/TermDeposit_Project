@@ -73,7 +73,7 @@ public class Main {
             //treeInstance.printTree();
             */
 
-            RandomForest forest = new RandomForest(data,42,100,5,5,0);
+            RandomForest forest = new RandomForest(data,42,200,5,5,0);
 
             //HashMap<String, Object> inputData = new HashMap<>();
             /* 

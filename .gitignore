@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+*.class
 
 # Linker output
 *.ilk
@@ -53,4 +54,4 @@ dkms.conf
 
 #sample files
 /Users/fangfang/Downloads/weka-example-master
-target/
+/Users/fangfang/Desktop/FA2024/Software_Engineer/TermDeposit_Project/target/classes/com/termdeposit/*
