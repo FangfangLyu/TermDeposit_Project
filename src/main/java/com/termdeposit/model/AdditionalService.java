@@ -65,4 +65,25 @@ public class AdditionalService {
         return Math.sqrt(distance);
     }// end-calculateDistance
 
+    public HashMap<String, Object> recordImprovements() {
+        HashMap<String, Object> closestPositive = findClosestPositive();
+        HashMap<String, Object> predictionInput = dataContainer.getPredictionInput();
+
+        if (closestPositive == null)
+            return null;
+
+        HashMap<String, Object> improvements = new HashMap<>();
+
+        for (String key : predictionInput.keySet()) {
+            Object userValue = predictionInput.get(key);
+            Object closestValue = closestPositive.get(key);
+
+            if (!userValue.equals(closestValue)) {
+                improvements.put(key, closestValue);
+            }
+        } // end-for
+
+        return improvements;
+    }// end-method recordImprovements
+
 }// end-class AdditionalService

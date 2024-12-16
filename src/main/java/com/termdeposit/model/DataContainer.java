@@ -18,26 +18,28 @@ import weka.core.neighboursearch.LinearNNSearch;
 import weka.core.neighboursearch.NearestNeighbourSearch;
 
 public class DataContainer {
-    private HashMap<String, String> featureDatatype; // TODO: For assignement 2, reflect the variable name changed from
-                                                     // inputDatatype to featureDatatype
+    private HashMap<String, String> featureDatatype;
+
     private HashMap<String, String> featureDatatype_afterTrain;
 
-    private HashMap<String, LinkedHashSet<String>> oneHotkeyValues; // TODO: NEW
-    private boolean isTrained; // TODO: NEW
+    private HashMap<String, LinkedHashSet<String>> oneHotkeyValues;
+    private boolean isTrained;
 
     // Note: Array is an interface, can not be instantiated, but it can store
     // ArrayList later.
     private List<HashMap<String, Object>> trainingData;
 
+    private List<HashMap<String, Object>> trainingDataWithMissing;
 
-    private List<HashMap<String, Object>> trainingDataWithMissing; // TODO: NEW
+    private List<HashMap<String, Object>> testingData;
 
     private List<HashMap<String,Object>> testingData;
 
     
     private KNN knn_model = null;
-    private HashMap<String,Object> predictionInput; 
-    private List<HashMap<String,Object>> addServiceOptions; 
+
+    private HashMap<String, Object> predictionInput;
+    private List<HashMap<String, Object>> addServiceOptions;
 
     private float minGain;
     private boolean hasMinGain;
@@ -80,7 +82,7 @@ public class DataContainer {
         this.isTrained = false;
     }
 
-    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting) throws Exception{
+    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting) throws Exception {
         /**
          * Preprocess a dataset from a file.
          *
@@ -136,25 +138,25 @@ public class DataContainer {
         }
         // Above step parse the input file
         preprocessData(data, isTesting);
-        if(!isTesting){
+        if (!isTesting) {
             this.trainingData = data;
         }
         return data;
 
     }
 
-    public List<HashMap<String, Object>> preprocessData(String[] headers, List<String> inputStringList, boolean isTesting) throws Exception{
+    public List<HashMap<String, Object>> preprocessData(String[] headers, List<String> inputStringList,
+            boolean isTesting) throws Exception {
         /**
          * Preprocess a dataset from a file.
          *
          * @param trainingSet Path to the dataset.
-         * @param isTesting Flag indicating if this is testing data.
+         * @param isTesting   Flag indicating if this is testing data.
          * @return A HashMap containing preprocessed data.
          */
         System.out.println("Test label start count:" + inputStringList.size());
 
         List<HashMap<String, Object>> data = new ArrayList<>();
-
 
         // Parse each subsequent line as a row of data
         for (int i = 0; i < inputStringList.size(); i++) {
@@ -175,7 +177,7 @@ public class DataContainer {
         }
         // Above step parse the input file
         data = preprocessData(data, isTesting);
-        if(!isTesting){
+        if (!isTesting) {
             this.trainingData = data;
         }
         return data;
@@ -392,11 +394,10 @@ public class DataContainer {
         return this.featureDatatype_afterTrain;
     }
 
-    public void setKnn(KNN knn){
-        //Have to set up knn after data is trained.
+    public void setKnn(KNN knn) {
+        // Have to set up knn after data is trained.
         this.knn_model = knn;
     }
-
 
     public HashMap<String, Object> getPredictionInput() { // TODO: NEW
         return this.predictionInput;
