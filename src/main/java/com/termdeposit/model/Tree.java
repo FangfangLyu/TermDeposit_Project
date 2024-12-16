@@ -22,9 +22,9 @@ public class Tree {
     private Random random;
 
 
-    public Tree(List<HashMap<String,Object>> trainingData2){
-        this.treeMinSampleSplit = 2;
-        this.treeMaxLayer = 5;
+    public Tree(int treeMinSampleSplit, int treeMaxLayer, List<HashMap<String,Object>> trainingData2){
+        this.treeMinSampleSplit = 5;
+        this.treeMaxLayer = 20;
         this.root = null;
         this.random = new Random(42);
         this.trainingData = trainingData2;
@@ -160,6 +160,9 @@ public class Tree {
         System.out.println("Tree grown complete");
 
         root = initialNode;
+        System.out.println(root);
+
+
         return root;
     }
     public TreeNode growTree(HashMap<String,String> featureList){
@@ -175,8 +178,10 @@ public class Tree {
 
         System.out.println("Tree grown complete");
 
+
         root = initialNode;
 
+        System.out.println(root.toString());
 
         return root;
     }

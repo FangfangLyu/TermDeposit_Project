@@ -1,11 +1,16 @@
 package com.termdeposit.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
 public class TreeTest {
+
     @Test
     public void TreeGrow(){
         
@@ -32,29 +37,34 @@ public class TreeTest {
 
         DataContainer data = new DataContainer(dataTypeMap);
         DataContainer.KNN knn = data.new KNN();
-        RandomForest forest = new RandomForest(data,42);
+        Tree tree = new Tree(2,5,data.getTrainingData()); //reference passed
+        RandomForest forest = new RandomForest(data,42,100,5,20,5);
 
-        String trainingSetPath = "test/fakeTrain.csv";
+        String trainingSetPath = "test/treeTest1.csv";
         
-        data.preprocessData(trainingSetPath, false);
-        try{
-            knn.train();
-            data.getTrainingData().addAll(knn.imputeMissingTrainingValues(data.gettrainingDataWithMissing()));
-            System.out.println(data.getTrainingData());
-            System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
-            System.out.println("RandomForest-------------");
-            System.out.println(forest.getRandomTrainingSubset(2,2));
+        try{        
+            data.preprocessData(trainingSetPath, false);
 
-            Tree treeInstance = new Tree(2,3, new Random(42), data.getTrainingData());
+            knn.train();
+            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing()));
+
+            Tree treeInstance = new Tree(2,3, data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
             
-            HashMap<String,String> selectedFeatures = new HashMap<>();
+            LinkedHashMap<String,String> selectedFeatures = new LinkedHashMap<>();
             selectedFeatures.put("job_technician", "String");
             selectedFeatures.put("balance", "Double");
             selectedFeatures.put("age", "Integer");
 
             //treeInstance.growTree(3);
-            treeInstance.growTree(selectedFeatures);
+               // public SplitResult findBestThreshold(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity){
+
+            TreeNode resultRoot = new TreeNode();
+            SplitResult result = tree.findBestThreshold(1, resultRoot,selectedFeatures, data.getTrainingData(), 1);
+
+            System.out.println(result);
+            assertEquals("job_technician", result.getFeatureName());
+            assertEquals("1.0", result.getThreshold().getValue().toString());
 
 
             System.out.println("Tree-------------");
@@ -68,4 +78,5 @@ public class TreeTest {
             e.printStackTrace(); // Prints the exception and the call stack
         }
     }
+    
 }

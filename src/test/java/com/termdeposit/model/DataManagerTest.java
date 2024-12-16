@@ -172,7 +172,7 @@ public class DataManagerTest {
 
 
         knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingTrainingValues(instance.gettrainingDataWithMissing());
+        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing());
         instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
@@ -201,7 +201,7 @@ public class DataManagerTest {
 
 
         knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingTrainingValues(instance.gettrainingDataWithMissing());
+        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing());
         instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
