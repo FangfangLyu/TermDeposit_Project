@@ -5,13 +5,20 @@ import javax.swing.border.Border;
 
 import com.termdeposit.controller.Manager;
 
+import javafx.scene.shape.Path;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
 import java.awt.event.*;
 import java.util.List;
 import java.util.HashMap;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class UserView extends JFrame {
     // new
@@ -40,7 +47,7 @@ public class UserView extends JFrame {
     // private int serviceInputCount;
     // private List inputUI;
 
-    public UserView() {
+    public UserView(Manager manager) {
         setTitle("Term Deposit Prediction Model");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -52,7 +59,7 @@ public class UserView extends JFrame {
 
         // set up four screens that will be switched out when needed
         this.mainScreen = createMainScreen();
-        this.trainScreen = createTrainScreen();
+        this.trainScreen = createTrainScreen(manager);
         this.predictScreen = createPredictScreen();
         this.addServiceScreen = createAddServiceScreen();
 
@@ -92,13 +99,13 @@ public class UserView extends JFrame {
         trainDefaultButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String trainingSetPath = "data/train.csv";
+                String defaultFileUrl = "data/train.csv";
                 try {
                     // TODO: fill out training on default here
-                    manager.startImputation(rootPaneCheckingEnabled, trainingSetPath);
-
+                    manager.startImputation(true, true, defaultFileUrl);  //trainingData, not testing
+                    
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Training model failed.");
+                    JOptionPane.showMessageDialog(null, "Training model on defualt data failed.");
                     ex.printStackTrace();
                 }
             }
@@ -109,6 +116,7 @@ public class UserView extends JFrame {
         trainCustomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //let user know about features to contain in CSV
                 HashMap<String, String> featureDatatype = manager.getFeatureList();
                 String message = createFieldMessage(featureDatatype);
 
@@ -119,23 +127,31 @@ public class UserView extends JFrame {
                 fileChooser.setDialogTitle("Select a CSV file for training");
 
                 int result = fileChooser.showOpenDialog(null);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File trainingSetPath = fileChooser.getSelectedFile();
-                    try {
-                        // TODO: put logic here for training model off of the file
 
-                    }
-                    // TODO: add multiple catch blocks for specific error spaces
-                    catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                if (result == JFileChooser.APPROVE_OPTION) {
+
+                    //get the selected file
+                    File selectedFile = fileChooser.getSelectedFile();
+
+                    try {
+                        manager.startImputation(false, true, selectedFile.getAbsolutePath());  //trainingData on the absolute path
+
+                    } catch (IOException ex) {
+                        // Handle file I/O error
+                        JOptionPane.showMessageDialog(null, "Failed to save the file to a temporary location", "Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        // Handle other exceptions
+                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error", JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
                     }
                 }
             }
         });
+        return panel;
     }
 
+  
     private JPanel createPredictScreen() {
 
     }

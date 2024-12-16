@@ -28,8 +28,11 @@ public class Manager {
 
     }
 
-    public void startImputation(boolean isUserData, String trainingSetPath) {
-        this.data.preprocessData(trainingSetPath, isUserData);
+    public void startImputation(boolean isDefault, boolean isTraining, String trainingSetPath) throws Exception {
+
+        this.data.preprocessData(trainingSetPath, !isTraining,isDefault);
+
+
     }
 
     public HashMap<String, String> getFeatureList() {

@@ -44,10 +44,7 @@ public class TreeTest {
         String trainingSetPath = "test/treeTest1.csv";
         
         try{        
-            data.preprocessData(trainingSetPath, false);
-
-            knn.train();
-            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+            data.preprocessData(trainingSetPath, false,true);
 
             Tree treeInstance = new Tree(2,3, data.getTrainingData());
             treeInstance.setDatatype(data.getFeatureAfterTrain());
