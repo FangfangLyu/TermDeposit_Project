@@ -17,36 +17,100 @@ public class RandomForest {
     private int treeSubsetSize;
     private int minPointToSplit;
     private int maxLayer;
+    private HashMap<String,String> featureAfterTrain;
+    public DataContainer dataContainer; // Reference to DataManager object
+
     private String forestOutputPath;
-    private DataContainer dataContainer; // Reference to DataManager object
     private Random random; // Initialize Random with a seed
 
     List<List<HashMap<String, Object>>> randomSubsets;
 
-    
+    private void defineFeature(){
+        HashMap<String, String> dataTypeMap = new HashMap<>();
 
+        dataTypeMap.put("y", "String");
+        dataTypeMap.put("job_technician", "String");
+        dataTypeMap.put("job_services", "String");
+        dataTypeMap.put("job_management", "String");
+        dataTypeMap.put("job_admin.", "String");
+        dataTypeMap.put("job_student", "String");
+        dataTypeMap.put("job_blue-collar", "String");
+        dataTypeMap.put("job_housemaid", "String");
+        dataTypeMap.put("job_retired", "String");
+        dataTypeMap.put("job_unemployed", "String");
+        dataTypeMap.put("job_self-employed", "String");
+        dataTypeMap.put("job_unknown", "String");
+        dataTypeMap.put("job_entrepreneur", "String");
+        dataTypeMap.put("marital_single", "String");
+        dataTypeMap.put("marital_married", "String");
+        dataTypeMap.put("marital_divorced", "String");
+        dataTypeMap.put("education_tertiary", "String");
+        dataTypeMap.put("education_secondary", "String");
+        dataTypeMap.put("education_unknown", "String");
+        dataTypeMap.put("education_primary", "String");
+        dataTypeMap.put("default_no", "String");
+        dataTypeMap.put("default_yes", "String");
+        dataTypeMap.put("housing_no", "String");
+        dataTypeMap.put("housing_yes", "String");
+        dataTypeMap.put("loan_no", "String");
+        dataTypeMap.put("loan_yes", "String");
+        dataTypeMap.put("contact_cellular", "String");
+        dataTypeMap.put("contact_unknown", "String");
+        dataTypeMap.put("contact_telephone", "String");
+        dataTypeMap.put("month_may", "String");
+        dataTypeMap.put("month_jun", "String");
+        dataTypeMap.put("month_aug", "String");
+        dataTypeMap.put("month_jul", "String");
+        dataTypeMap.put("month_sep", "String");
+        dataTypeMap.put("month_nov", "String");
+        dataTypeMap.put("month_mar", "String");
+        dataTypeMap.put("month_apr", "String");
+        dataTypeMap.put("month_jan", "String");
+        dataTypeMap.put("month_feb", "String");
+        dataTypeMap.put("month_oct", "String");
+        dataTypeMap.put("month_dec", "String");
+        dataTypeMap.put("poutcome_unknown", "String");
+        dataTypeMap.put("poutcome_failure", "String");
+        dataTypeMap.put("poutcome_other", "String");
+        dataTypeMap.put("poutcome_success", "String");
+        
+        dataTypeMap.put("ID", "String"); 
+
+        dataTypeMap.put("age", "Integer");
+        dataTypeMap.put("balance", "Double");  // balance is a continuous value, so it's a Double
+        dataTypeMap.put("day", "Integer");  // day is a numerical value, so it's an Integer
+        dataTypeMap.put("campaign", "Integer");  // campaign is a numerical value, so it's an Integer
+        dataTypeMap.put("pdays", "Integer");  // pdays is a numerical value, so it's an Integer
+        dataTypeMap.put("previous", "Integer");
+        featureAfterTrain = dataTypeMap;
+    }
+    
     // Constructor
     public RandomForest(DataContainer dataContainer, int randomSeed, int treeNum, int minPointToSplit, int maxLayer, int featureSplitCount) {
         this.dataContainer = dataContainer; // Set the reference to DataManager
+        //this.featureAfterTrain = dataContainer.getFeatureAfterTrain();
 
-        if(featureSplitCount != 0){
-            this.treeFeatureSelectCount = featureSplitCount;
-        }else{
-            this.treeFeatureSelectCount = dataContainer.getFeatureAfterTrain().size();
-        }
+        this.treeFeatureSelectCount = dataContainer.getFeatureAfterTrain().size();
         this.random = new Random(randomSeed); // Initialize Random with a seed
         this.forest = new ArrayList<>();
 
         this.minPointToSplit = minPointToSplit;
         this.maxLayer = maxLayer;
         this.treeNum = treeNum;
+        defineFeature();
     }
 
     // Get random training subset
     public List<List<HashMap<String, Object>>> getRandomTrainingSubset( ) {
 
-        this.treeSubsetSize = Math.max(1, dataContainer.getTrainingData().size() / treeNum);
+        this.treeSubsetSize = Math.max(2, dataContainer.getTrainingData().size() / treeNum);
 
+        // Ensure the subset size is at least 2
+        if (treeSubsetSize < 2) {
+            // Throw an exception if the subset size is less than 2
+            throw new IllegalArgumentException("Tree subset size cannot be less than 2. " +
+                                            "The number of trees (" + treeNum + ") is too large for the available data.");
+        }
         // Implement logic to get the random training subset
         //treeSubsetSize = 100; //temp
         this.randomSubsets = new ArrayList<>();
@@ -65,6 +129,8 @@ public class RandomForest {
             // Add the subset to the list of random subsets
             this.randomSubsets.add(new ArrayList<>(subset));
         }
+                defineFeature();
+
         return this.randomSubsets; // Placeholder
     }
     
@@ -97,7 +163,8 @@ public class RandomForest {
     public Tree growTreeInitial( List<HashMap<String, Object>> trainingData) throws Exception {
         // Implement logic to grow an initial tree
         Tree tree = new Tree(this.minPointToSplit, this.maxLayer, trainingData);
-        tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
+        tree.setDatatype(featureAfterTrain);
+        System.out.println(featureAfterTrain);
         
         
         String content = tree.growTree(treeFeatureSelectCount).toString(); //number of random features to split on
@@ -130,6 +197,7 @@ public class RandomForest {
         for (List<HashMap<String, Object>> subset : randomSubsets) {
             // Grow a tree for each subset
             Tree tree = growTreeInitial(subset);
+            System.out.println(tree);
             forest.add(tree); // Add the tree to the forest
         }
         return forest;
@@ -155,7 +223,7 @@ public class RandomForest {
         }
 
         // If the majority of trees predict true, return true, otherwise false
-        //System.out.println("Result for true in the predictions of the forest: "+ trueVotes + " / "+ results.size());
+        System.out.println("Result for true in the predictions of the forest: "+ trueVotes + " / "+ results.size());
 
         return trueVotes > results.size() / 2;
     }

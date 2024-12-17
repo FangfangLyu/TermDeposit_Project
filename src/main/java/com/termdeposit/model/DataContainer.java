@@ -156,6 +156,66 @@ public class DataContainer {
 
     }
 
+    private void defineFeature() {
+        HashMap<String, String> dataTypeMap = new HashMap<>();
+
+        dataTypeMap.put("y", "String");
+        dataTypeMap.put("job_technician", "String");
+        dataTypeMap.put("job_services", "String");
+        dataTypeMap.put("job_management", "String");
+        dataTypeMap.put("job_admin.", "String");
+        dataTypeMap.put("job_student", "String");
+        dataTypeMap.put("job_blue-collar", "String");
+        dataTypeMap.put("job_housemaid", "String");
+        dataTypeMap.put("job_retired", "String");
+        dataTypeMap.put("job_unemployed", "String");
+        dataTypeMap.put("job_self-employed", "String");
+        dataTypeMap.put("job_unknown", "String");
+        dataTypeMap.put("job_entrepreneur", "String");
+        dataTypeMap.put("marital_single", "String");
+        dataTypeMap.put("marital_married", "String");
+        dataTypeMap.put("marital_divorced", "String");
+        dataTypeMap.put("education_tertiary", "String");
+        dataTypeMap.put("education_secondary", "String");
+        dataTypeMap.put("education_unknown", "String");
+        dataTypeMap.put("education_primary", "String");
+        dataTypeMap.put("default_no", "String");
+        dataTypeMap.put("default_yes", "String");
+        dataTypeMap.put("housing_no", "String");
+        dataTypeMap.put("housing_yes", "String");
+        dataTypeMap.put("loan_no", "String");
+        dataTypeMap.put("loan_yes", "String");
+        dataTypeMap.put("contact_cellular", "String");
+        dataTypeMap.put("contact_unknown", "String");
+        dataTypeMap.put("contact_telephone", "String");
+        dataTypeMap.put("month_may", "String");
+        dataTypeMap.put("month_jun", "String");
+        dataTypeMap.put("month_aug", "String");
+        dataTypeMap.put("month_jul", "String");
+        dataTypeMap.put("month_sep", "String");
+        dataTypeMap.put("month_nov", "String");
+        dataTypeMap.put("month_mar", "String");
+        dataTypeMap.put("month_apr", "String");
+        dataTypeMap.put("month_jan", "String");
+        dataTypeMap.put("month_feb", "String");
+        dataTypeMap.put("month_oct", "String");
+        dataTypeMap.put("month_dec", "String");
+        dataTypeMap.put("poutcome_unknown", "String");
+        dataTypeMap.put("poutcome_failure", "String");
+        dataTypeMap.put("poutcome_other", "String");
+        dataTypeMap.put("poutcome_success", "String");
+
+        dataTypeMap.put("ID", "String");
+
+        dataTypeMap.put("age", "Integer");
+        dataTypeMap.put("balance", "Double"); // balance is a continuous value, so it's a Double
+        dataTypeMap.put("day", "Integer"); // day is a numerical value, so it's an Integer
+        dataTypeMap.put("campaign", "Integer"); // campaign is a numerical value, so it's an Integer
+        dataTypeMap.put("pdays", "Integer"); // pdays is a numerical value, so it's an Integer
+        dataTypeMap.put("previous", "Integer");
+        this.featureDatatype_afterTrain = dataTypeMap;
+    }
+
     public List<HashMap<String, Object>> preprocessData(String[] headers, List<String> inputStringList,
             boolean isTesting) throws Exception {
         /**
@@ -246,7 +306,10 @@ public class DataContainer {
             this.knn_model = this.new KNN();
             this.knn_model.train();
             // knn_model.saveModel("knn.bin");
+
             this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing, false));
+        } else {
+
         }
 
         return inputs;
@@ -333,7 +396,11 @@ public class DataContainer {
                     System.err.println("Warning: Skipping row because the data contains no y value.");
                     throw new IllegalArgumentException("Skip");
                 }
-                hasMissingValue = true;
+                if (feature.equals("y") && !isTrained) {
+                    System.err.println("Testing cases");
+                } else {
+                    hasMissingValue = true;
+                }
             }
         }
         // If the row has missing values, move it to the list of data points with

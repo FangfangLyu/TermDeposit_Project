@@ -38,7 +38,7 @@ public class RandomForestTest {
         dataTypeMap.put("y", "String");            // Target variable (y) is typically a String or Boolean
 
         DataContainer data = new DataContainer(dataTypeMap);
-        DataContainer.KNN knn = data.new KNN();
+        //DataContainer.KNN knn = data.new KNN();
         Tree tree = new Tree(2,5,data.getTrainingData()); //reference passed
         RandomForest forest = new RandomForest(data,42,2,2,5,3);
 

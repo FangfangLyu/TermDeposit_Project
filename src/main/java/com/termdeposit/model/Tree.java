@@ -172,6 +172,7 @@ public class Tree {
         this.root = null;
         this.random = new Random(42);
         this.trainingData = trainingData2;
+        //this.featureDataType = featureDataType;
     }
 
     public Tree(int treeMinSampleSplit, int treeMaxLayer, Random random, List<HashMap<String,Object>> trainingData){
@@ -180,6 +181,8 @@ public class Tree {
         this.root = null;
         this.random = random;
         this.trainingData = trainingData;
+        //this.featureDataType = featureDataType;
+
     }
 
     public void setDatatype(HashMap<String,String> featureDataType){
@@ -194,12 +197,13 @@ public class Tree {
         if (!current.isLeaf()) {
             String feature = current.getFeatName();
             Threshold valueObj = current.getThreshold();
-            //System.out.println("Testing "+feature);
+            System.out.println("Testing "+feature);
             Object inputValue = predictionInput.get(feature);
-            //System.out.println("Input value "+inputValue);
+            System.out.println("Input value "+inputValue);
 
             String type = featureDataType.get(feature);
-            //System.out.println("Input type "+type);
+            
+            System.out.println("Input type "+type);
 
 
             if(type.equals("String")){
