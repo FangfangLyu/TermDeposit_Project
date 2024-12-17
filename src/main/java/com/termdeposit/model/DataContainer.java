@@ -1,9 +1,14 @@
 package com.termdeposit.model;
 
 import java.util.*;
+
+import com.termdeposit.model.DataContainer.KNN;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk; //this IBk package from weka contains KNN method
@@ -33,7 +38,7 @@ public class DataContainer {
 
     private List<HashMap<String, Object>> testingData;
     
-    private KNN knn_model = null;
+    public KNN knn_model = null;
 
     private HashMap<String, Object> predictionInput;
     private List<HashMap<String, Object>> addServiceOptions;
@@ -79,19 +84,28 @@ public class DataContainer {
         this.isTrained = false;
     }
 
-    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting) throws Exception {
+    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting, boolean isDefault) throws Exception {
         /**
          * Preprocess a dataset from a file.
          *
-         * @param trainingSet Path to the dataset.
+         * @param trainingSet Path to the dataset. (= name in a sense.)
          * @param isTesting   Flag indicating if this is testing data.
          * @return A HashMap containing preprocessed data.
          */
         List<HashMap<String, Object>> data = new ArrayList<>();
+        InputStream inputStream;
+        if(isDefault){
+            // Read all lines from the file
+            inputStream =getClass().getClassLoader().getResourceAsStream(trainingSetUrl);
 
-        // Read all lines from the file
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(trainingSetUrl);
+        }else{
 
+            // Convert the absolute path to a File object
+            File tempFilePath = new File(trainingSetUrl); //can cross multiple platform
+            // Now open the temp file
+            inputStream = new FileInputStream(tempFilePath);
+
+        }
         List<String> lines = new ArrayList<>();
 
         if (inputStream == null) {
@@ -135,9 +149,7 @@ public class DataContainer {
         }
         // Above step parse the input file
         preprocessData(data, isTesting);
-        if (!isTesting) {
-            this.trainingData = data;
-        }
+
         return data;
 
     }
@@ -177,6 +189,18 @@ public class DataContainer {
         if (!isTesting) {
             this.trainingData = data;
         }
+
+        
+        if (!isTesting) {
+            this.trainingData = data;
+            //data is updated here 
+            //Set up knn_model
+            this.knn_model = this.new KNN();
+            knn_model.train();
+            //knn_model.saveModel("knn.bin");
+            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing,false));
+        }
+
         return data;
 
     }
@@ -210,6 +234,17 @@ public class DataContainer {
                     }
                 }
             }
+        }
+        
+        if (!isTesting) {
+            this.trainingData = inputs;
+            //data is updated here 
+
+            //Set up knn_model
+            this.knn_model = this.new KNN();
+            this.knn_model.train();
+            //knn_model.saveModel("knn.bin");
+            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing,false));
         }
 
         return inputs;

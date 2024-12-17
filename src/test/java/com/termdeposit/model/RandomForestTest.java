@@ -44,10 +44,7 @@ public class RandomForestTest {
 
         String trainingSetPath = "test/forestTest1.csv";
         
-        data.preprocessData(trainingSetPath, false);
-
-        knn.train();
-        data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+        data.preprocessData(trainingSetPath, false,true);
         
         List<Tree> trees = forest.growTreeForest();
         System.out.println("0iei12\n"+trees);
@@ -57,7 +54,6 @@ public class RandomForestTest {
 
         assertTrue(!result); //if not true
         
-
         //treeInstance.growTree(3);
             // public SplitResult findBestThreshold(int layer, TreeNode currentNode, HashMap<String, String> remainingFeatures, List<HashMap<String, Object>> remainingTrainingData, double inputImpurity){
 

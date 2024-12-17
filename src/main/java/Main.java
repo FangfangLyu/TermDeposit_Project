@@ -46,10 +46,10 @@ public class Main {
         //String trainingSetPath = "data/train.csv";
         
         try{
-            data.preprocessData(trainingSetPath, false);
-            knn.train();
-            knn.saveModel("knn.bin");
-            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+            data.preprocessData(trainingSetPath, false,true);
+            //knn.train();
+            //knn.saveModel("knn.bin");
+            //data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
             System.out.println(data.getTrainingData());
             System.out.println(data.getFeatureAfterTrain()); //TODO: to enahnce the overall structure, this can be map the new variable name back to the original by sdtoring it part of the value.
             System.out.println("RandomForest-------------");
@@ -73,7 +73,7 @@ public class Main {
             //treeInstance.printTree();
             */
 
-            RandomForest forest = new RandomForest(data,42,200,5,5,0);
+            RandomForest forest = new RandomForest(data,42,200,10,5,0);
 
             //HashMap<String, Object> inputData = new HashMap<>();
             /* 

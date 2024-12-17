@@ -42,10 +42,7 @@ public class TreeNodeTest {
         String trainingSetPath = "test/treeTest1.csv";
         
         try{        
-            data.preprocessData(trainingSetPath, false);
-
-            knn.train();
-            data.getTrainingData().addAll(knn.imputeMissingValues(data.gettrainingDataWithMissing(),false));
+            data.preprocessData(trainingSetPath, false,true);
 
             LinkedHashMap<String,String> selectedFeatures = new LinkedHashMap<>();
             selectedFeatures.put("job_technician", "String");

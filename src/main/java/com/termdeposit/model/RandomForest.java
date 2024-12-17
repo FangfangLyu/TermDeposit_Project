@@ -45,7 +45,7 @@ public class RandomForest {
     // Get random training subset
     public List<List<HashMap<String, Object>>> getRandomTrainingSubset( ) {
 
-        this.treeSubsetSize = Math.max(2, dataContainer.getTrainingData().size() / treeNum);
+        this.treeSubsetSize = Math.max(1, dataContainer.getTrainingData().size() / treeNum);
 
         // Implement logic to get the random training subset
         //treeSubsetSize = 100; //temp
@@ -98,7 +98,8 @@ public class RandomForest {
         // Implement logic to grow an initial tree
         Tree tree = new Tree(this.minPointToSplit, this.maxLayer, trainingData);
         tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
-        //tree.setDatatype(this.dataContainer.getFeatureAfterTrain());
+        
+        
         String content = tree.growTree(treeFeatureSelectCount).toString(); //number of random features to split on
         
         /*String filename = "./tree";
@@ -119,13 +120,12 @@ public class RandomForest {
     // Intiates to grow all trees by calling this method, which this underying method will activate the corresponding method in the Tree class
     public List<Tree> growTreeForest() throws Exception {
         getRandomTrainingSubset(); //TEMP HYPERPARAMETER
+        printSubsetIds();
 
         System.out.println("This many subsets:  "+ randomSubsets.size() + " generated.");
 
-        System.out.println("Random subset of size "+ treeSubsetSize + " generated.");
+        System.out.println("Random subset of size "+  treeSubsetSize + " generated.");
 
-
-        printSubsetIds();
 
         for (List<HashMap<String, Object>> subset : randomSubsets) {
             // Grow a tree for each subset

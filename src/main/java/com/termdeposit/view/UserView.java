@@ -5,13 +5,20 @@ import javax.swing.border.Border;
 
 import com.termdeposit.controller.Manager;
 
+import javafx.scene.shape.Path;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
 import java.awt.event.*;
 import java.util.List;
 import java.util.HashMap;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class UserView extends JFrame {
     // new
@@ -40,7 +47,7 @@ public class UserView extends JFrame {
     // private int serviceInputCount;
     // private List inputUI;
 
-    public UserView() {
+    public UserView(Manager manager) {
         setTitle("Term Deposit Prediction Model");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -52,7 +59,7 @@ public class UserView extends JFrame {
 
         // set up four screens that will be switched out when needed
         this.mainScreen = createMainScreen();
-        this.trainScreen = createTrainScreen();
+        this.trainScreen = createTrainScreen(manager);
         this.predictScreen = createPredictScreen();
         this.addServiceScreen = createAddServiceScreen();
 
@@ -92,13 +99,12 @@ public class UserView extends JFrame {
         trainDefaultButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String trainingSetPath = "data/train.csv";
+                String defaultFileUrl = "data/train.csv";
                 try {
-                    // TODO: fill out training on default here
-                    manager.startImputation(rootPaneCheckingEnabled, trainingSetPath);
-
+                    manager.startImputation(true, true, defaultFileUrl);  //trainingData, not testing
+                    
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Training model failed.");
+                    JOptionPane.showMessageDialog(null, "Training model on defualt data failed.");
                     ex.printStackTrace();
                 }
             }
@@ -109,6 +115,7 @@ public class UserView extends JFrame {
         trainCustomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //let user know about features to contain in CSV
                 HashMap<String, String> featureDatatype = manager.getFeatureList();
                 String message = createFieldMessage(featureDatatype);
 
@@ -119,25 +126,182 @@ public class UserView extends JFrame {
                 fileChooser.setDialogTitle("Select a CSV file for training");
 
                 int result = fileChooser.showOpenDialog(null);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File trainingSetPath = fileChooser.getSelectedFile();
-                    try {
-                        // TODO: put logic here for training model off of the file
 
-                    }
-                    // TODO: add multiple catch blocks for specific error spaces
-                    catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                if (result == JFileChooser.APPROVE_OPTION) {
+
+                    //get the selected file
+                    File selectedFile = fileChooser.getSelectedFile();
+
+                    try {
+                        manager.startImputation(false, true, selectedFile.getAbsolutePath());  //trainingData on the absolute path
+
+                    } catch (IOException ex) {
+                        // Handle file I/O error
+                        JOptionPane.showMessageDialog(null, "Failed to save the file to a temporary location", "Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        // Handle other exceptions
+                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error", JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
                     }
                 }
             }
         });
+        return panel;
     }
 
-    private JPanel createPredictScreen() {
+  
+    private JPanel createPredictScreen(Manager manager) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(16, 2, 10, 10)); // Grid layout for form fields
+        
+        // Labels for each input field
+        JLabel ageLabel = new JLabel("Age:");
+        JLabel jobLabel = new JLabel("Job:");
+        JLabel maritalLabel = new JLabel("Marital Status:");
+        JLabel educationLabel = new JLabel("Education:");
+        JLabel defaultLabel = new JLabel("Has Credit Default?");
+        JLabel balanceLabel = new JLabel("Balance:");
+        JLabel housingLabel = new JLabel("Has Housing Loan?");
+        JLabel loanLabel = new JLabel("Has Personal Loan?");
+        JLabel contactLabel = new JLabel("Contact Communication Type:");
+        JLabel dayLabel = new JLabel("Last Contact Day of Month:");
+        JLabel monthLabel = new JLabel("Last Contact Month:");
+        JLabel campaignLabel = new JLabel("Number of Contacts During Campaign:");
+        JLabel pdaysLabel = new JLabel("Days Since Last Contact:");
+        JLabel previousLabel = new JLabel("Number of Contacts Before Campaign:");
+        JLabel poutcomeLabel = new JLabel("Previous Outcome:");
+        
+        // Input fields for each label
+        JTextField ageField = new JTextField();
+        JTextField balanceField = new JTextField();
+        JTextField dayField = new JTextField();
+        JTextField campaignField = new JTextField();
+        JTextField pdaysField = new JTextField();
+        JTextField previousField = new JTextField();
+        
+        // ComboBoxes for categorical variables
+        
+        String[] jobOptions = {"management", "services", "blue-collar", "technician", "admin.", "retired","self-employed", "housemaid", "entrepreneur", "student"};
+        JComboBox<String> jobField = new JComboBox<>(jobOptions);
+        
+        String[] maritalOptions = {"Single", "Married", "Divorced"};
+        JComboBox<String> maritalField = new JComboBox<>(maritalOptions);
+        
+        String[] educationOptions = {"Primary", "Secondary", "Tertiary", "Unknown"};
+        JComboBox<String> educationField = new JComboBox<>(educationOptions);
+        
+        String[] defaultOptions = {"Yes", "No"};
+        JComboBox<String> defaultField = new JComboBox<>(defaultOptions);
+        
+        String[] housingOptions = {"Yes", "No"};
+        JComboBox<String> housingField = new JComboBox<>(housingOptions);
+        
+        String[] loanOptions = {"Yes", "No"};
+        JComboBox<String> loanField = new JComboBox<>(loanOptions);
+        
+        String[] contactOptions = {"Cellular", "Telephone", "Unknown"};
+        JComboBox<String> contactField = new JComboBox<>(contactOptions);
+        
+        String[] monthOptions = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        JComboBox<String> monthField = new JComboBox<>(monthOptions);
+        
+        String[] poutcomeOptions = {"Success", "Failure", "other", "unknown"};
+        JComboBox<String> poutcomeField = new JComboBox<>(poutcomeOptions);
+        
+        // Add the fields to the panel
+        panel.add(ageLabel);
+        panel.add(ageField);
+        
+        panel.add(jobLabel);
+        panel.add(jobField);
+        
+        panel.add(maritalLabel);
+        panel.add(maritalField);
+        
+        panel.add(educationLabel);
+        panel.add(educationField);
+        
+        panel.add(defaultLabel);
+        panel.add(defaultField);
+        
+        panel.add(balanceLabel);
+        panel.add(balanceField);
+        
+        panel.add(housingLabel);
+        panel.add(housingField);
+        
+        panel.add(loanLabel);
+        panel.add(loanField);
+        
+        panel.add(contactLabel);
+        panel.add(contactField);
+        
+        panel.add(dayLabel);
+        panel.add(dayField);
+        
+        panel.add(monthLabel);
+        panel.add(monthField);
+        
+        panel.add(campaignLabel);
+        panel.add(campaignField);
+        
+        panel.add(pdaysLabel);
+        panel.add(pdaysField);
+        
+        panel.add(previousLabel);
+        panel.add(previousField);
+        
+        panel.add(poutcomeLabel);
+        panel.add(poutcomeField);
+        
+        // Add a submit button to perform the prediction
+        JButton predictButton = new JButton("Predict");
+        predictButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Gather input data
+                    int age = Integer.parseInt(ageField.getText());
+                    String job = jobField.getSelectedItem().toString();
+                    String marital = maritalField.getSelectedItem().toString();
+                    String education = educationField.getSelectedItem().toString();
+                    String creditDefault = defaultField.getSelectedItem().toString();
+                    double balance = Double.parseDouble(balanceField.getText());
+                    String housing = housingField.getSelectedItem().toString();
+                    String loan = loanField.getSelectedItem().toString();
+                    String contact = contactField.getSelectedItem().toString();
+                    int day = Integer.parseInt(dayField.getText());
+                    String month = monthField.getSelectedItem().toString();
+                    int campaign = Integer.parseInt(campaignField.getText());
+                    int pdays = Integer.parseInt(pdaysField.getText());
+                    int previous = Integer.parseInt(previousField.getText());
+                    String poutcome = poutcomeField.getSelectedItem().toString();
+            
+                    // Validate inputs - check if the numeric fields are empty or invalid
+                    if (job == null || marital == null || education == null || creditDefault == null || housing == null || loan == null || contact == null || month == null || poutcome == null) {
+                    JOptionPane.showMessageDialog(null, "Please fill in all the fields.");
+                    return; // Don't proceed with prediction if any field is missing
+                    }
 
+                    // Send data to the Manager for prediction (assuming you have a method in Manager for this)
+                    boolean prediction = manager.predictionTriggered(age, job, marital, education, creditDefault, balance, 
+                                                                            housing, loan, contact, day, month, campaign, 
+                                                                            pdays, previous, poutcome);
+    
+                    // Show the result to the user
+                    String resultMessage = prediction ? "The customer will likely subscribe." : "The customer will likely not subscribe.";
+                    JOptionPane.showMessageDialog(null, resultMessage);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Please enter valid numeric values.");
+                }
+            }
+        });
+        
+        // Add the prediction button
+        panel.add(predictButton);
+        
+        return panel;
     }
 
     private JPanel createAddServiceScreen() {

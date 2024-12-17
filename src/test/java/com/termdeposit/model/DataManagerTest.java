@@ -160,19 +160,13 @@ public class DataManagerTest {
         
 
         DataContainer instance = new DataContainer(dataTypeMap);
-        DataContainer.KNN knn = instance.new KNN();
-        
 
         //input
-        instance.preprocessData("test/test_with_missing.csv",false);
+        instance.preprocessData("test/test_with_missing.csv",false,true);
         
         //expected outputs
         List<HashMap<String,Object>> expectedResult= readCSVFile("test/test_with_missing_expected.csv");
 
-
-        knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing(),false);
-        instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
 
@@ -189,19 +183,12 @@ public class DataManagerTest {
         
 
         DataContainer instance = new DataContainer(dataTypeMap);
-        DataContainer.KNN knn = instance.new KNN();
-        
-
         //input
-        instance.preprocessData("test/test_with_missing_num.csv",false);
+        instance.preprocessData("test/test_with_missing_num.csv",false,true);
         
         //expected outputs
         List<HashMap<String,Object>> expectedResult= readCSVFile("test/test_with_missing_expected_num.csv");
 
-
-        knn.train();
-        List<HashMap<String,Object>> result = knn.imputeMissingValues(instance.gettrainingDataWithMissing(),false);
-        instance.addTrainingData(result); 
 
         assertTrue(compareListOfMapsByValue(instance.getTrainingData(), expectedResult));
 

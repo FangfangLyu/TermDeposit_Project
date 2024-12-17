@@ -10,3 +10,10 @@ ID,age,job,marital,education,default,balance,housing,loan,contact,day,month,camp
 8,55,technician,single,tertiary,no,20000,no,no,cellular,11,may,2,-1,0,unknown,yes
 9,21,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
 10,20,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no
+11,21,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+12,20,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no
+13,40,technician,single,tertiary,no,40000,no,no,cellular,11,may,2,-1,0,unknown,yes
+14,27,technician,married,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+15,55,technician,single,tertiary,no,20000,no,no,cellular,11,may,2,-1,0,unknown,yes
+16,21,technician,single,tertiary,no,18254,no,no,cellular,11,may,2,-1,0,unknown,no
+17,20,services,single,secondary,no,512,yes,yes,unknown,5,jun,3,-1,0,unknown,no

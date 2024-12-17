@@ -299,6 +299,10 @@ public class Tree {
         //need code;
         this.featureDataType.remove("ID");
         TreeNode initialNode = new TreeNode();
+
+        if(featureNum == 0){
+            featureNum = this.featureDataType.size();
+        }
         grow(1, initialNode, selectRandomFeatures(featureNum),trainingData,1);
 
         System.out.println("Tree grown complete");
@@ -404,8 +408,11 @@ public class Tree {
 
             double currentImpurity = 1; // Initialize the impurity for this feature
             
-            //System.out.println("type:"+type);
-            //System.out.println("dataSize:"+dataSize);
+            System.out.println("type:"+type);
+            System.out.println("featyre:"+feature);
+
+            System.out.println("dataSize:"+dataSize);
+            //System.out.println("Remaining training:"+remainingTrainingData);
 
 
             List<HashMap<String, Object>> trainingDataLeft = new ArrayList<>();
