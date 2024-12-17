@@ -35,13 +35,23 @@ public class Manager {
 
     }
 
+    public HashMap<String, Object> initAdditionalService() {
+        additionalService = new AdditionalService(data);
+        return additionalService.recordImprovements();
+    }
+
+    public HashMap<String, Object> getPredictionInput() {
+        return this.data.getPredictionInput();
+    }
+
+    public HashMap<String, Object> getImputedPredictionInput() {
+        return this.data.getImputedPredictionInput();
+    }
+
     public HashMap<String, String> getFeatureList() {
         return this.data.getFeatureList();
     }
 
-    public void allowPrediction() {
-        view.add
-    }
     // public void trigger() {
 
     // }
@@ -74,9 +84,17 @@ public class Manager {
 
         try {
             // Make the prediction
+            // Save raw data
+            this.data.setPredictionInput(inputData);
+
+            // impute user's input
             inputData = this.data.preprocessSingleData(inputData);
             inputData = this.data.knn_model.oneHotkeyEncodingForSingle(inputData);
 
+            // save imputed data
+            this.data.setImputedPredictionInput(inputData);
+
+            // get prediction
             boolean prediction = this.randomForest.randomForestPrediction(inputData);
 
             // Return the result as a boolean based on the model's prediction

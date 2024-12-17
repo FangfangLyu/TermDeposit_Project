@@ -2,6 +2,7 @@ package com.termdeposit.view;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
 
 import com.termdeposit.controller.Manager;
 
@@ -10,6 +11,7 @@ import javafx.scene.shape.Path;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.event.*;
 import java.util.List;
 import java.util.HashMap;
@@ -77,6 +79,7 @@ public class UserView extends JFrame {
 
         cardLayout.show(mainPanel, "MainScreen1");
 
+        // initialize ActionListener for quit button
         this.quitListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -361,7 +364,51 @@ public class UserView extends JFrame {
 
     private JPanel createAddServiceScreen(Manager manager) {
         JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        JLabel instructionLabel = new JLabel(
+                "Ways your customer's profile might need to change to get positive prediction");
+        instructionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(instructionLabel);
+        panel.add(Box.createVerticalStrut(5));
+
+        // User's Prediction Input Table
+        JTable predictionTable = createTable(manager.getPredictionInput());
+        JScrollPane predictScrollPane = new JScrollPane(predictionTable);
+        predictScrollPane.setBorder(BorderFactory.createTitledBorder("Prediction Input"));
+
+        // Comparison Table
+        JTable comparisonTable = createTable(manager.initAdditionalService());
+        JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
+        comparisonScrollPane.setBorder(BorderFactory.createTitledBorder("Comparison"));
+
+        // previous button
+        JButton previousButton = new JButton("Previous Screen");
+        previousButton.addActionListener(createMoveListener("PredictionScreen"));
+
+        panel.add(predictScrollPane);
+        panel.add(Box.createVerticalStrut(13));
+        panel.add(comparisonScrollPane);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(previousButton);
+
+        return panel;
+    }
+
+    private JTable createTable(HashMap<String, Object> input) {
+        String[] headerNames = input.keySet().toArray(new String[0]);
+        Object[] rows = input.values().toArray();
+
+        Object[][] data = { rows };
+
+        JTable table = new JTable(new DefaultTableModel(data, headerNames));
+
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(100);
+        }
+        return table;
     }
 
     // TODO: update render() function in class diagram to this instead

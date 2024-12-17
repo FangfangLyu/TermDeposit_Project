@@ -37,10 +37,11 @@ public class DataContainer {
     private List<HashMap<String, Object>> trainingDataWithMissing;
 
     private List<HashMap<String, Object>> testingData;
-    
+
     public KNN knn_model = null;
 
     private HashMap<String, Object> predictionInput;
+    private HashMap<String, Object> imputedPredictionInput;
     private List<HashMap<String, Object>> addServiceOptions;
 
     private float minGain;
@@ -84,7 +85,8 @@ public class DataContainer {
         this.isTrained = false;
     }
 
-    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting, boolean isDefault) throws Exception {
+    public List<HashMap<String, Object>> preprocessData(String trainingSetUrl, boolean isTesting, boolean isDefault)
+            throws Exception {
         /**
          * Preprocess a dataset from a file.
          *
@@ -94,14 +96,14 @@ public class DataContainer {
          */
         List<HashMap<String, Object>> data = new ArrayList<>();
         InputStream inputStream;
-        if(isDefault){
+        if (isDefault) {
             // Read all lines from the file
-            inputStream =getClass().getClassLoader().getResourceAsStream(trainingSetUrl);
+            inputStream = getClass().getClassLoader().getResourceAsStream(trainingSetUrl);
 
-        }else{
+        } else {
 
             // Convert the absolute path to a File object
-            File tempFilePath = new File(trainingSetUrl); //can cross multiple platform
+            File tempFilePath = new File(trainingSetUrl); // can cross multiple platform
             // Now open the temp file
             inputStream = new FileInputStream(tempFilePath);
 
@@ -190,38 +192,38 @@ public class DataContainer {
             this.trainingData = data;
         }
 
-        
         if (!isTesting) {
             this.trainingData = data;
-            //data is updated here 
-            //Set up knn_model
+            // data is updated here
+            // Set up knn_model
             this.knn_model = this.new KNN();
             knn_model.train();
-            //knn_model.saveModel("knn.bin");
-            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing,false));
+            // knn_model.saveModel("knn.bin");
+            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing, false));
         }
 
         return data;
 
     }
 
-
-    public List<HashMap<String, Object>> preprocessData(List<HashMap<String,Object>> inputs, boolean isTesting) throws Exception{
-        // Output list is not needed in this case since we modify the input list in place
+    public List<HashMap<String, Object>> preprocessData(List<HashMap<String, Object>> inputs, boolean isTesting)
+            throws Exception {
+        // Output list is not needed in this case since we modify the input list in
+        // place
         List<HashMap<String, Object>> rowsToFill = new ArrayList<>();
 
-        
         // Iterate over the list using index-based for loop
         for (int i = 0; i < inputs.size(); i++) {
             HashMap<String, Object> row = inputs.get(i);
-            
+
             try {
                 preprocessSingleData(row); // Process the data row (this method should be defined elsewhere)
             } catch (IllegalArgumentException e) {
                 // Handle missing data (e.g., if some values are missing)
                 if (e.getMessage().equals("Fill")) {
                     if (!isTesting) {
-                        // If not testing, add row to the missing data list and remove it from the inputs
+                        // If not testing, add row to the missing data list and remove it from the
+                        // inputs
                         System.out.println("Missing value during training.");
                         this.trainingDataWithMissing.add(row);
                         inputs.remove(i); // Remove the row with missing data
@@ -230,29 +232,30 @@ public class DataContainer {
                         // If testing, we need to fill the missing values
                         System.out.println("Testing missing value. Finding and filling.");
                         HashMap<String, Object> filledRow = knn_nearestSearch(row, isTesting);
-                        inputs.set(i, filledRow);  // Replace the row at position i with the filled row
+                        inputs.set(i, filledRow); // Replace the row at position i with the filled row
                     }
                 }
             }
         }
-        
+
         if (!isTesting) {
             this.trainingData = inputs;
-            //data is updated here 
+            // data is updated here
 
-            //Set up knn_model
+            // Set up knn_model
             this.knn_model = this.new KNN();
             this.knn_model.train();
-            //knn_model.saveModel("knn.bin");
-            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing,false));
+            // knn_model.saveModel("knn.bin");
+            this.trainingData.addAll(this.knn_model.imputeMissingValues(this.trainingDataWithMissing, false));
         }
 
         return inputs;
 
     }
 
-    public HashMap<String,Object> knn_nearestSearch(HashMap<String, Object> input, boolean isTesting) throws Exception{
-        List<HashMap<String,Object>> input_list = new ArrayList<HashMap<String,Object>>();
+    public HashMap<String, Object> knn_nearestSearch(HashMap<String, Object> input, boolean isTesting)
+            throws Exception {
+        List<HashMap<String, Object>> input_list = new ArrayList<HashMap<String, Object>>();
 
         if (this.knn_model == null) {
             throw new IllegalStateException("knn_model is not initialized");
@@ -266,7 +269,7 @@ public class DataContainer {
             throw new IllegalStateException("Encoding returned null for the input");
         }
         input_list.add(encoded);
-        List<HashMap<String, Object>> imputedList = this.knn_model.imputeMissingValues(input_list,isTesting);
+        List<HashMap<String, Object>> imputedList = this.knn_model.imputeMissingValues(input_list, isTesting);
         if (imputedList == null || imputedList.isEmpty()) {
             throw new IllegalStateException("Imputed list is null or empty");
         }
@@ -435,6 +438,18 @@ public class DataContainer {
         return this.predictionInput;
     }
 
+    public HashMap<String, Object> getImputedPredictionInput() { // TODO: NEW
+        return this.imputedPredictionInput;
+    }
+
+    public void setImputedPredictionInput(HashMap<String, Object> imputedPredictionInput) {
+        this.imputedPredictionInput = imputedPredictionInput;
+    }
+
+    public void setPredictionInput(HashMap<String, Object> predictionInput) {
+        this.predictionInput = predictionInput;
+    }
+
     public List<HashMap<String, Object>> getTestingData() { // TODO: NEW
         return this.testingData;
     }
@@ -581,7 +596,8 @@ public class DataContainer {
                         // If it's a String that can be parsed into a Number, attempt to parse it
                         else if (value instanceof String) {
                             try {
-                                // Try parsing the string into a double (you can use other numeric types if needed)
+                                // Try parsing the string into a double (you can use other numeric types if
+                                // needed)
                                 double parsedValue = Double.parseDouble((String) value);
                                 instance.setValue(j, parsedValue);
                             } catch (NumberFormatException e) {
@@ -591,7 +607,8 @@ public class DataContainer {
                             }
                         } else {
                             // If it's not a Number or String, you may want to handle it differently
-                            System.err.println("Unexpected data type for feature " + feature + ": " + value.getClass().getName());
+                            System.err.println(
+                                    "Unexpected data type for feature " + feature + ": " + value.getClass().getName());
                             instance.setMissing(j); // Set missing if the type is unexpected
                         }
                     } else {
@@ -683,7 +700,8 @@ public class DataContainer {
         }
 
         // Perform KNN imputation for missing values in the dataset
-        public List<HashMap<String, Object>> imputeMissingValues(List<HashMap<String, Object>> missingData, Boolean isTesting)
+        public List<HashMap<String, Object>> imputeMissingValues(List<HashMap<String, Object>> missingData,
+                Boolean isTesting)
                 throws Exception {
 
             List<HashMap<String, Object>> encodedData = this.oneHotkeyEncoding(missingData);
@@ -770,13 +788,13 @@ public class DataContainer {
                             }
                         }
                     }
-                    //System.out.println(instance);
+                    // System.out.println(instance);
 
                 }
 
             }
 
-            //System.out.println("Imputation completed.");
+            // System.out.println("Imputation completed.");
 
             // Reintroduce "id" and "y" back into the data
             List<HashMap<String, Object>> results = new LinkedList<>();
@@ -787,7 +805,7 @@ public class DataContainer {
                 HashMap<String, Object> newRow = new HashMap<>();
 
                 // Iterate through all attributes to check for missing values and impute them
-                //System.out.println("Before update: " + originalRow);
+                // System.out.println("Before update: " + originalRow);
 
                 // Get the ID and y from the originalRow
                 if (originalRow == null) {
@@ -796,12 +814,11 @@ public class DataContainer {
                 Object ID = originalRow.get("ID");
                 Object y = originalRow.get("y");
 
-                if(!isTesting && y == null){
+                if (!isTesting && y == null) {
                     throw new IllegalStateException("'y' is missing in the original row.");
                 }
 
-
-                //System.out.println("Before update: " + originalRow);
+                // System.out.println("Before update: " + originalRow);
 
                 if (ID == null) {
                     // Handle ID column
@@ -816,7 +833,7 @@ public class DataContainer {
                     newRow.put("ID", ID);
                 }
 
-                //System.out.println("Before update: " + originalRow);
+                // System.out.println("Before update: " + originalRow);
 
                 /* */
                 for (String uniqueValue : DataContainer.this.oneHotkeyValues.get("y")) {
@@ -830,7 +847,7 @@ public class DataContainer {
                     newRow.put(feature, imputedValue); // Substitute the missing value back
                 }
 
-                //System.out.println("After update: " + newRow);
+                // System.out.println("After update: " + newRow);
 
                 results.add(newRow);
             }

@@ -22,7 +22,7 @@ public class AdditionalService {
         totalData.addAll(dataContainer.getTestingData());
 
         // get user input (single line)
-        HashMap<String, Object> userInput = dataContainer.getPredictionInput();
+        HashMap<String, Object> userInput = dataContainer.getImputedPredictionInput();
 
         // iterate through all the data row by row
         for (HashMap<String, Object> row : totalData) {
