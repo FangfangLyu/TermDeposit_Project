@@ -58,13 +58,15 @@ public class UserView extends JFrame {
 
         // set up cardlayout and main screen (screens will switch out on this)
         this.cardLayout = new CardLayout();
-        this.mainPanel = new JPanel();
+        this.mainPanel = new JPanel(cardLayout);
+        this.manager = manager;
+
 
         // set up four screens that will be switched out when needed
         this.mainScreen1 = createMainScreen();
         this.mainScreen2 = updateMainScreen(true);
         this.trainScreen = createTrainScreen(manager);
-        this.predictScreen = createPredictScreen();
+        this.predictScreen = createPredictScreen(manager);
         this.addServiceScreen = createAddServiceScreen();
 
         mainPanel.add(mainScreen1, "MainScreen1");
@@ -132,6 +134,8 @@ public class UserView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String defaultFileUrl = "data/train.csv";
+                //defaultFileUrl = "data/fakeTrain.csv";
+                System.out.println(defaultFileUrl);
                 try {
                     manager.startImputation(true, true, defaultFileUrl); // trainingData, not testing
 
@@ -185,6 +189,8 @@ public class UserView extends JFrame {
 
                     endTrainingScreen();
                 }
+                cardLayout.show(mainPanel, "PredictScreen");
+
             }
         });
 
@@ -229,11 +235,18 @@ public class UserView extends JFrame {
         JTextField campaignField = new JTextField();
         JTextField pdaysField = new JTextField();
         JTextField previousField = new JTextField();
+        
+        //default values
+        ageField.setText("30");  // Default value for age
+        balanceField.setText("1500");  // Default value for balance
+        dayField.setText("15");  // Default value for day
+        campaignField.setText("0");  // Default value for campaign
+        pdaysField.setText("-1");  // Default value for pdays (use 999 for no contact)
+        previousField.setText("0");  // Default value for previous
 
         // ComboBoxes for categorical variables
-
-        String[] jobOptions = { "management", "services", "blue-collar", "technician", "admin.", "retired",
-                "self-employed", "housemaid", "entrepreneur", "student" };
+        
+        String[] jobOptions = {"management", "services", "blue-collar", "technician", "admin.", "retired","self-employed", "housemaid", "entrepreneur", "student", "unemployed","unknown", "entrepreneur"};
         JComboBox<String> jobField = new JComboBox<>(jobOptions);
 
         String[] maritalOptions = { "Single", "Married", "Divorced" };
@@ -352,14 +365,27 @@ public class UserView extends JFrame {
                 }
             }
         });
+        JButton addButton = new JButton("AdditionalService");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                cardLayout.show(mainPanel, "createAddServiceScreen");
 
+            }
+        });
+        
         // Add the prediction button
         panel.add(predictButton);
-
+        panel.add(addButton);
+        
         return panel;
     }
 
     private JPanel createAddServiceScreen() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(16, 2, 10, 10)); // Grid layout for form fields
+        
+        return panel;
         JPanel panel = new JPanel();
 
     }
