@@ -6,8 +6,6 @@ import javax.swing.table.DefaultTableModel;
 
 import com.termdeposit.controller.Manager;
 
-import javafx.scene.shape.Path;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
