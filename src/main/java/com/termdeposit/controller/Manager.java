@@ -60,7 +60,7 @@ public class Manager {
         try {
             // RandomForest forest = new
             // RandomForest(this.data,randomSeed,treeNum,minDataToSplit,minDataToSplit,featureNum);
-            this.randomForest = new RandomForest(this.data, 42, 1, 10, 1, 0);
+            this.randomForest = new RandomForest(this.data, 42, 200, 10, 5, 0);
             randomForest.growTreeForest();
         } catch (Exception e) {
             // TODO Auto-generated catch block

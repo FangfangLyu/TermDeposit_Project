@@ -206,7 +206,8 @@ public class UserView extends JFrame {
 
     private void endTrainingScreen() {
         JOptionPane.showMessageDialog(null, "Predictive model trained and validated.\nMoving to main screen...");
-        this.cardLayout.show(mainPanel, "mainScreen2");
+        cardLayout.show(mainPanel, "MainScreen2");
+
     }
 
     private JPanel createPredictScreen(Manager manager) {
