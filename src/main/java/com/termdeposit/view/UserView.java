@@ -28,10 +28,13 @@ public class UserView extends JFrame {
     private JPanel mainPanel;
 
     // screens to be switched out
-    private JPanel mainScreen;
+    private JPanel mainScreen1;
+    private JPanel mainScreen2;
     private JPanel trainScreen;
     private JPanel predictScreen;
     private JPanel addServiceScreen;
+
+    private ActionListener quitListener;
 
     // old
     // private JButton openButton;
@@ -58,42 +61,71 @@ public class UserView extends JFrame {
         this.mainPanel = new JPanel();
 
         // set up four screens that will be switched out when needed
-        this.mainScreen = createMainScreen();
+        this.mainScreen1 = createMainScreen();
+        this.mainScreen2 = updateMainScreen(true);
         this.trainScreen = createTrainScreen(manager);
         this.predictScreen = createPredictScreen();
         this.addServiceScreen = createAddServiceScreen();
 
-        mainPanel.add(mainScreen, "MainScreen");
+        mainPanel.add(mainScreen1, "MainScreen1");
+        mainPanel.add(mainScreen2, "MainScreen2");
         mainPanel.add(trainScreen, "TrainScreen");
         mainPanel.add(predictScreen, "PredictScreen");
         mainPanel.add(addServiceScreen, "AddServiceScreen");
 
         add(mainPanel);
 
-        cardLayout.show(mainPanel, "MainScreen");
+        cardLayout.show(mainPanel, "MainScreen1");
+
+        this.quitListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        };
+
+    }
+
+    private ActionListener createMoveListener(String screenName) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, screenName);
+            }
+        };
     }
 
     private JPanel createMainScreen() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
+
         JLabel instructionLabel = new JLabel("Welcome to Term Deposit Predictor.\nPlease select an option.",
                 JLabel.CENTER);
-        JButton trainButton = new JButton("Train Model");
-        trainButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, "TrainScreen");
-            }
-        });
 
-        panel.add(instructionLabel, BorderLayout.NORTH);
-        panel.add(trainButton, BorderLayout.CENTER);
+        JButton trainButton = new JButton("Train Model");
+        JButton quitButton = new JButton("Quit Program");
+
+        // add actionListener for moving to training screen
+        trainButton.addActionListener(createMoveListener("TrainScreen"));
+
+        // add actionListener for quitting program
+        quitButton.addActionListener(quitListener);
+
+        panel.add(instructionLabel);
+        panel.add(trainButton);
+        panel.add(quitButton);
 
         return panel;
     }
 
     private JPanel createTrainScreen(Manager manager) {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1, 10, 15));
+        panel.setLayout(new GridLayout(4, 1, 10, 15));
+
+        JLabel label = new JLabel("Select a Training Option", JLabel.CENTER);
+
+        // go back to previous screen, allowing user to access Quit
+        JButton previousButton = new JButton("Previous Screen");
+        previousButton.addActionListener(createMoveListener("MainScreen1"));
 
         JButton trainDefaultButton = new JButton("Train From Default CSV");
         trainDefaultButton.addActionListener(new ActionListener() {
@@ -101,12 +133,15 @@ public class UserView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String defaultFileUrl = "data/train.csv";
                 try {
-                    manager.startImputation(true, true, defaultFileUrl);  //trainingData, not testing
-                    
+                    manager.startImputation(true, true, defaultFileUrl); // trainingData, not testing
+
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Training model on defualt data failed.");
+                    JOptionPane.showMessageDialog(null, "Training model on default data failed.");
                     ex.printStackTrace();
                 }
+
+                endTrainingScreen();
+
             }
 
         });
@@ -115,7 +150,7 @@ public class UserView extends JFrame {
         trainCustomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //let user know about features to contain in CSV
+                // let user know about features to contain in CSV
                 HashMap<String, String> featureDatatype = manager.getFeatureList();
                 String message = createFieldMessage(featureDatatype);
 
@@ -129,32 +164,47 @@ public class UserView extends JFrame {
 
                 if (result == JFileChooser.APPROVE_OPTION) {
 
-                    //get the selected file
+                    // get the selected file
                     File selectedFile = fileChooser.getSelectedFile();
 
                     try {
-                        manager.startImputation(false, true, selectedFile.getAbsolutePath());  //trainingData on the absolute path
+                        manager.startImputation(false, true, selectedFile.getAbsolutePath()); // trainingData on the
+                                                                                              // absolute path
 
                     } catch (IOException ex) {
                         // Handle file I/O error
-                        JOptionPane.showMessageDialog(null, "Failed to save the file to a temporary location", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Failed to save the file to a temporary location", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
                     } catch (Exception ex) {
                         // Handle other exceptions
-                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Failed to train model", "Error",
+                                JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
                     }
+
+                    endTrainingScreen();
                 }
             }
         });
+
+        panel.add(label);
+        panel.add(trainDefaultButton);
+        panel.add(trainCustomButton);
+        panel.add(previousButton);
+
         return panel;
     }
 
-  
+    private void endTrainingScreen() {
+        JOptionPane.showMessageDialog(null, "Predictive model trained and validated.\nMoving to main screen...");
+        this.cardLayout.show(mainPanel, "mainScreen2");
+    }
+
     private JPanel createPredictScreen(Manager manager) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(16, 2, 10, 10)); // Grid layout for form fields
-        
+
         // Labels for each input field
         JLabel ageLabel = new JLabel("Age:");
         JLabel jobLabel = new JLabel("Job:");
@@ -171,7 +221,7 @@ public class UserView extends JFrame {
         JLabel pdaysLabel = new JLabel("Days Since Last Contact:");
         JLabel previousLabel = new JLabel("Number of Contacts Before Campaign:");
         JLabel poutcomeLabel = new JLabel("Previous Outcome:");
-        
+
         // Input fields for each label
         JTextField ageField = new JTextField();
         JTextField balanceField = new JTextField();
@@ -179,82 +229,83 @@ public class UserView extends JFrame {
         JTextField campaignField = new JTextField();
         JTextField pdaysField = new JTextField();
         JTextField previousField = new JTextField();
-        
+
         // ComboBoxes for categorical variables
-        
-        String[] jobOptions = {"management", "services", "blue-collar", "technician", "admin.", "retired","self-employed", "housemaid", "entrepreneur", "student"};
+
+        String[] jobOptions = { "management", "services", "blue-collar", "technician", "admin.", "retired",
+                "self-employed", "housemaid", "entrepreneur", "student" };
         JComboBox<String> jobField = new JComboBox<>(jobOptions);
-        
-        String[] maritalOptions = {"Single", "Married", "Divorced"};
+
+        String[] maritalOptions = { "Single", "Married", "Divorced" };
         JComboBox<String> maritalField = new JComboBox<>(maritalOptions);
-        
-        String[] educationOptions = {"Primary", "Secondary", "Tertiary", "Unknown"};
+
+        String[] educationOptions = { "Primary", "Secondary", "Tertiary", "Unknown" };
         JComboBox<String> educationField = new JComboBox<>(educationOptions);
-        
-        String[] defaultOptions = {"Yes", "No"};
+
+        String[] defaultOptions = { "Yes", "No" };
         JComboBox<String> defaultField = new JComboBox<>(defaultOptions);
-        
-        String[] housingOptions = {"Yes", "No"};
+
+        String[] housingOptions = { "Yes", "No" };
         JComboBox<String> housingField = new JComboBox<>(housingOptions);
-        
-        String[] loanOptions = {"Yes", "No"};
+
+        String[] loanOptions = { "Yes", "No" };
         JComboBox<String> loanField = new JComboBox<>(loanOptions);
-        
-        String[] contactOptions = {"Cellular", "Telephone", "Unknown"};
+
+        String[] contactOptions = { "Cellular", "Telephone", "Unknown" };
         JComboBox<String> contactField = new JComboBox<>(contactOptions);
-        
-        String[] monthOptions = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+        String[] monthOptions = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         JComboBox<String> monthField = new JComboBox<>(monthOptions);
-        
-        String[] poutcomeOptions = {"Success", "Failure", "other", "unknown"};
+
+        String[] poutcomeOptions = { "Success", "Failure", "other", "unknown" };
         JComboBox<String> poutcomeField = new JComboBox<>(poutcomeOptions);
-        
+
         // Add the fields to the panel
         panel.add(ageLabel);
         panel.add(ageField);
-        
+
         panel.add(jobLabel);
         panel.add(jobField);
-        
+
         panel.add(maritalLabel);
         panel.add(maritalField);
-        
+
         panel.add(educationLabel);
         panel.add(educationField);
-        
+
         panel.add(defaultLabel);
         panel.add(defaultField);
-        
+
         panel.add(balanceLabel);
         panel.add(balanceField);
-        
+
         panel.add(housingLabel);
         panel.add(housingField);
-        
+
         panel.add(loanLabel);
         panel.add(loanField);
-        
+
         panel.add(contactLabel);
         panel.add(contactField);
-        
+
         panel.add(dayLabel);
         panel.add(dayField);
-        
+
         panel.add(monthLabel);
         panel.add(monthField);
-        
+
         panel.add(campaignLabel);
         panel.add(campaignField);
-        
+
         panel.add(pdaysLabel);
         panel.add(pdaysField);
-        
+
         panel.add(previousLabel);
         panel.add(previousField);
-        
+
         panel.add(poutcomeLabel);
         panel.add(poutcomeField);
-        
+
         // Add a submit button to perform the prediction
         JButton predictButton = new JButton("Predict");
         predictButton.addActionListener(new ActionListener() {
@@ -277,39 +328,68 @@ public class UserView extends JFrame {
                     int pdays = Integer.parseInt(pdaysField.getText());
                     int previous = Integer.parseInt(previousField.getText());
                     String poutcome = poutcomeField.getSelectedItem().toString();
-            
+
                     // Validate inputs - check if the numeric fields are empty or invalid
-                    if (job == null || marital == null || education == null || creditDefault == null || housing == null || loan == null || contact == null || month == null || poutcome == null) {
-                    JOptionPane.showMessageDialog(null, "Please fill in all the fields.");
-                    return; // Don't proceed with prediction if any field is missing
+                    if (job == null || marital == null || education == null || creditDefault == null || housing == null
+                            || loan == null || contact == null || month == null || poutcome == null) {
+                        JOptionPane.showMessageDialog(null, "Please fill in all the fields.");
+                        return; // Don't proceed with prediction if any field is missing
                     }
 
-                    // Send data to the Manager for prediction (assuming you have a method in Manager for this)
-                    boolean prediction = manager.predictionTriggered(age, job, marital, education, creditDefault, balance, 
-                                                                            housing, loan, contact, day, month, campaign, 
-                                                                            pdays, previous, poutcome);
-    
+                    // Send data to the Manager for prediction (assuming you have a method in
+                    // Manager for this)
+                    boolean prediction = manager.predictionTriggered(age, job, marital, education, creditDefault,
+                            balance,
+                            housing, loan, contact, day, month, campaign,
+                            pdays, previous, poutcome);
+
                     // Show the result to the user
-                    String resultMessage = prediction ? "The customer will likely subscribe." : "The customer will likely not subscribe.";
+                    String resultMessage = prediction ? "The customer will likely subscribe."
+                            : "The customer will likely not subscribe.";
                     JOptionPane.showMessageDialog(null, resultMessage);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Please enter valid numeric values.");
                 }
             }
         });
-        
+
         // Add the prediction button
         panel.add(predictButton);
-        
+
         return panel;
     }
 
     private JPanel createAddServiceScreen() {
+        JPanel panel = new JPanel();
 
     }
 
     // TODO: update render() function in class diagram to this instead
-    public void updateMainScreen(boolean allowPrediction, boolean allowAddService) {
+    private JPanel updateMainScreen(boolean triggerPrediction) {
+        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
+
+        JLabel instructionLabel = new JLabel("Model now trained.\nPrediction Available now.\nPlease select an option.",
+                JLabel.CENTER);
+
+        JButton trainButton = new JButton("Retrain Model?");
+        JButton predictButton = new JButton("Prediction Service");
+        JButton quitButton = new JButton("Quit Program");
+
+        // add actionListener for moving to training screen
+        trainButton.addActionListener(createMoveListener("TrainScreen"));
+
+        predictButton.addActionListener(createMoveListener("PredictScreen"));
+
+        // add actionListener for quitting program
+        quitButton.addActionListener(quitListener);
+
+        panel.add(instructionLabel);
+        panel.add(trainButton);
+        panel.add(predictButton);
+        panel.add(quitButton);
+
+        return panel;
+    }
 
     }
 

@@ -31,15 +31,18 @@ public class Manager {
 
     public void startImputation(boolean isDefault, boolean isTraining, String trainingSetPath) throws Exception {
 
-        this.data.preprocessData(trainingSetPath, !isTraining,isDefault);
-
+        this.data.preprocessData(trainingSetPath, !isTraining, isDefault);
 
     }
 
     public HashMap<String, String> getFeatureList() {
         return this.data.getFeatureList();
     }
-    // public void bootstrapBuildRandomForest() {
+
+    public void allowPrediction() {
+        view.add
+    }
+    // public void trigger() {
 
     // }
 
@@ -47,11 +50,10 @@ public class Manager {
 
     // }
 
-    public boolean predictionTriggered(int age, String job, String marital, String education, String creditDefault, 
-                double balance, String housing, String loan, String contact, 
-                int day, String month, int campaign, int pdays, int previous, 
-                String poutcome)
-    {
+    public boolean predictionTriggered(int age, String job, String marital, String education, String creditDefault,
+            double balance, String housing, String loan, String contact,
+            int day, String month, int campaign, int pdays, int previous,
+            String poutcome) {
         HashMap<String, Object> inputData = new HashMap<>();
 
         inputData.put("age", age);
@@ -73,12 +75,12 @@ public class Manager {
         try {
             // Make the prediction
             inputData = this.data.preprocessSingleData(inputData);
-            inputData =  this.data.knn_model.oneHotkeyEncodingForSingle(inputData);
+            inputData = this.data.knn_model.oneHotkeyEncodingForSingle(inputData);
 
             boolean prediction = this.randomForest.randomForestPrediction(inputData);
 
             // Return the result as a boolean based on the model's prediction
-            return prediction;  // Assuming class 1 means subscription, class 0 means no subscription
+            return prediction; // Assuming class 1 means subscription, class 0 means no subscription
 
         } catch (Exception e) {
             e.printStackTrace();
