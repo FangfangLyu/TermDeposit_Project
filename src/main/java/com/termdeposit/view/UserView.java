@@ -64,8 +64,8 @@ public class UserView extends JFrame {
         this.mainScreen1 = createMainScreen();
         this.mainScreen2 = updateMainScreen(true);
         this.trainScreen = createTrainScreen(manager);
-        this.predictScreen = createPredictScreen();
-        this.addServiceScreen = createAddServiceScreen();
+        this.predictScreen = createPredictScreen(manager);
+        this.addServiceScreen = createAddServiceScreen(manager);
 
         mainPanel.add(mainScreen1, "MainScreen1");
         mainPanel.add(mainScreen2, "MainScreen2");
@@ -359,7 +359,7 @@ public class UserView extends JFrame {
         return panel;
     }
 
-    private JPanel createAddServiceScreen() {
+    private JPanel createAddServiceScreen(Manager manager) {
         JPanel panel = new JPanel();
 
     }
@@ -391,8 +391,6 @@ public class UserView extends JFrame {
         return panel;
     }
 
-    }
-
     private static String createFieldMessage(HashMap<String, String> featureDatatype) {
         StringBuilder builder = new StringBuilder();
 
@@ -401,117 +399,5 @@ public class UserView extends JFrame {
         }
         return builder.toString();
     }
-
-    // add action listener methods for buttons
-    public void addTrainDefaultListener(ActionListener actionListener) {
-        trainDefaultButton.addActionListener(actionListener);
-    }
-
-    public void addTrainCustomListener(ActionListener actionListener) {
-        // actionListener should trigger upload operation
-        trainCustomButton.addActionListener(actionListener);
-    }
-
-    // menuBar = new JMenuBar();
-
-    // file = new JMenu("File");
-
-    // input = new JMenuItem("Input");
-    // input.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-
-    // openButton = new JButton("Select a CSV File");
-    // openButton.setBounds(100, 100, 150, 50);
-    // openButton.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // fileChooser = new JFileChooser();
-    // fileChooser.setDialogTitle("Select a CSV File");
-    // fileChooser
-    // .setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV
-    // Files", "csv"));
-
-    // int userSelectedFile = fileChooser.showOpenDialog(null);
-    // if (userSelectedFile == JFileChooser.APPROVE_OPTION) {
-    // File csvFile = fileChooser.getSelectedFile();
-    // if (csvFile.getName().toLowerCase().endsWith(".csv")) {
-    // // process csvFile using manager class
-    // } else {
-    // JOptionPane.showMessageDialog(null, "Please select a valid CSV file.",
-    // "Invalid File",
-    // JOptionPane.ERROR_MESSAGE);
-    // }
-
-    // }
-    // }
-    // });
-    // add(openButton);
-    // }
-    // });
-
-    // exit = new JMenuItem("Exit");
-    // exit.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // System.exit(0);
-    // }
-    // });
-
-    // file.add(input);
-    // file.add(exit);
-    // menuBar.add(file);
-
-    // functions = new JMenu("Functions");
-
-    // predict = new JMenuItem("Predict");
-    // predict.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // label.setText("Predict Started");
-    // }
-    // });
-
-    // calc = new JMenuItem("Calculator");
-    // calc.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // label.setText("Calc Pressed");
-    // calcScreen = new JFrame();
-    // calcScreen.setTitle("Deposit Growth Calculator");
-    // calcScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    // calcScreen.setSize(300, 200);
-    // calcScreen.setLayout(null);
-
-    // calcGrowth = new JButton("Growth");
-    // calcGrowth.setBounds(100, 50, 100, 30);
-    // calcScreen.add(calcGrowth);
-
-    // calcGrowth.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // label.setText("calcGrowth Clicked");
-    // }
-    // });
-
-    // calcMinGain = new JButton("Minimum Gain");
-    // calcMinGain.setBounds(100, 100, 100, 30);
-    // calcScreen.add(calcMinGain);
-
-    // calcMinGain.addActionListener(new ActionListener() {
-    // public void actionPerformed(ActionEvent e) {
-    // label.setText("calcMinGain Clicked");
-    // }
-    // });
-
-    // calcScreen.setVisible(true);
-    // }
-    // });
-
-    // functions.add(predict);
-    // functions.add(calc);
-    // menuBar.add(functions);
-
-    // label = new JLabel("");
-    // label.setBounds(100, 50, 100, 30);
-    // add(label);
-
-    // setJMenuBar(menuBar);
-    // setVisible(true);
-    // }
 
 }
