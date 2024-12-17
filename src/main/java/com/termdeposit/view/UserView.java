@@ -101,7 +101,6 @@ public class UserView extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String defaultFileUrl = "data/train.csv";
                 try {
-                    // TODO: fill out training on default here
                     manager.startImputation(true, true, defaultFileUrl);  //trainingData, not testing
                     
                 } catch (Exception ex) {
@@ -152,8 +151,157 @@ public class UserView extends JFrame {
     }
 
   
-    private JPanel createPredictScreen() {
+    private JPanel createPredictScreen(Manager manager) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(16, 2, 10, 10)); // Grid layout for form fields
+        
+        // Labels for each input field
+        JLabel ageLabel = new JLabel("Age:");
+        JLabel jobLabel = new JLabel("Job:");
+        JLabel maritalLabel = new JLabel("Marital Status:");
+        JLabel educationLabel = new JLabel("Education:");
+        JLabel defaultLabel = new JLabel("Has Credit Default?");
+        JLabel balanceLabel = new JLabel("Balance:");
+        JLabel housingLabel = new JLabel("Has Housing Loan?");
+        JLabel loanLabel = new JLabel("Has Personal Loan?");
+        JLabel contactLabel = new JLabel("Contact Communication Type:");
+        JLabel dayLabel = new JLabel("Last Contact Day of Month:");
+        JLabel monthLabel = new JLabel("Last Contact Month:");
+        JLabel campaignLabel = new JLabel("Number of Contacts During Campaign:");
+        JLabel pdaysLabel = new JLabel("Days Since Last Contact:");
+        JLabel previousLabel = new JLabel("Number of Contacts Before Campaign:");
+        JLabel poutcomeLabel = new JLabel("Previous Outcome:");
+        
+        // Input fields for each label
+        JTextField ageField = new JTextField();
+        JTextField balanceField = new JTextField();
+        JTextField dayField = new JTextField();
+        JTextField campaignField = new JTextField();
+        JTextField pdaysField = new JTextField();
+        JTextField previousField = new JTextField();
+        
+        // ComboBoxes for categorical variables
+        
+        String[] jobOptions = {"management", "services", "blue-collar", "technician", "admin.", "retired","self-employed", "housemaid", "entrepreneur", "student"};
+        JComboBox<String> jobField = new JComboBox<>(jobOptions);
+        
+        String[] maritalOptions = {"Single", "Married", "Divorced"};
+        JComboBox<String> maritalField = new JComboBox<>(maritalOptions);
+        
+        String[] educationOptions = {"Primary", "Secondary", "Tertiary", "Unknown"};
+        JComboBox<String> educationField = new JComboBox<>(educationOptions);
+        
+        String[] defaultOptions = {"Yes", "No"};
+        JComboBox<String> defaultField = new JComboBox<>(defaultOptions);
+        
+        String[] housingOptions = {"Yes", "No"};
+        JComboBox<String> housingField = new JComboBox<>(housingOptions);
+        
+        String[] loanOptions = {"Yes", "No"};
+        JComboBox<String> loanField = new JComboBox<>(loanOptions);
+        
+        String[] contactOptions = {"Cellular", "Telephone", "Unknown"};
+        JComboBox<String> contactField = new JComboBox<>(contactOptions);
+        
+        String[] monthOptions = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        JComboBox<String> monthField = new JComboBox<>(monthOptions);
+        
+        String[] poutcomeOptions = {"Success", "Failure", "other", "unknown"};
+        JComboBox<String> poutcomeField = new JComboBox<>(poutcomeOptions);
+        
+        // Add the fields to the panel
+        panel.add(ageLabel);
+        panel.add(ageField);
+        
+        panel.add(jobLabel);
+        panel.add(jobField);
+        
+        panel.add(maritalLabel);
+        panel.add(maritalField);
+        
+        panel.add(educationLabel);
+        panel.add(educationField);
+        
+        panel.add(defaultLabel);
+        panel.add(defaultField);
+        
+        panel.add(balanceLabel);
+        panel.add(balanceField);
+        
+        panel.add(housingLabel);
+        panel.add(housingField);
+        
+        panel.add(loanLabel);
+        panel.add(loanField);
+        
+        panel.add(contactLabel);
+        panel.add(contactField);
+        
+        panel.add(dayLabel);
+        panel.add(dayField);
+        
+        panel.add(monthLabel);
+        panel.add(monthField);
+        
+        panel.add(campaignLabel);
+        panel.add(campaignField);
+        
+        panel.add(pdaysLabel);
+        panel.add(pdaysField);
+        
+        panel.add(previousLabel);
+        panel.add(previousField);
+        
+        panel.add(poutcomeLabel);
+        panel.add(poutcomeField);
+        
+        // Add a submit button to perform the prediction
+        JButton predictButton = new JButton("Predict");
+        predictButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Gather input data
+                    int age = Integer.parseInt(ageField.getText());
+                    String job = jobField.getSelectedItem().toString();
+                    String marital = maritalField.getSelectedItem().toString();
+                    String education = educationField.getSelectedItem().toString();
+                    String creditDefault = defaultField.getSelectedItem().toString();
+                    double balance = Double.parseDouble(balanceField.getText());
+                    String housing = housingField.getSelectedItem().toString();
+                    String loan = loanField.getSelectedItem().toString();
+                    String contact = contactField.getSelectedItem().toString();
+                    int day = Integer.parseInt(dayField.getText());
+                    String month = monthField.getSelectedItem().toString();
+                    int campaign = Integer.parseInt(campaignField.getText());
+                    int pdays = Integer.parseInt(pdaysField.getText());
+                    int previous = Integer.parseInt(previousField.getText());
+                    String poutcome = poutcomeField.getSelectedItem().toString();
+            
+                    // Validate inputs - check if the numeric fields are empty or invalid
+                    if (job == null || marital == null || education == null || creditDefault == null || housing == null || loan == null || contact == null || month == null || poutcome == null) {
+                    JOptionPane.showMessageDialog(null, "Please fill in all the fields.");
+                    return; // Don't proceed with prediction if any field is missing
+                    }
 
+                    // Send data to the Manager for prediction (assuming you have a method in Manager for this)
+                    boolean prediction = manager.predictionTriggered(age, job, marital, education, creditDefault, balance, 
+                                                                            housing, loan, contact, day, month, campaign, 
+                                                                            pdays, previous, poutcome);
+    
+                    // Show the result to the user
+                    String resultMessage = prediction ? "The customer will likely subscribe." : "The customer will likely not subscribe.";
+                    JOptionPane.showMessageDialog(null, resultMessage);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Please enter valid numeric values.");
+                }
+            }
+        });
+        
+        // Add the prediction button
+        panel.add(predictButton);
+        
+        return panel;
     }
 
     private JPanel createAddServiceScreen() {

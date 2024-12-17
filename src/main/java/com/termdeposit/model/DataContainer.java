@@ -38,7 +38,7 @@ public class DataContainer {
 
     private List<HashMap<String, Object>> testingData;
     
-    private KNN knn_model = null;
+    public KNN knn_model = null;
 
     private HashMap<String, Object> predictionInput;
     private List<HashMap<String, Object>> addServiceOptions;

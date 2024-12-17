@@ -6,6 +6,7 @@ import com.termdeposit.model.DataContainer;
 
 import com.termdeposit.view.UserView;
 
+import weka.core.Instance;
 import weka.knowledgeflow.Data;
 
 import java.util.HashMap;
@@ -46,9 +47,45 @@ public class Manager {
 
     // }
 
-    // public void predictionTriggered() {
+    public boolean predictionTriggered(int age, String job, String marital, String education, String creditDefault, 
+                double balance, String housing, String loan, String contact, 
+                int day, String month, int campaign, int pdays, int previous, 
+                String poutcome)
+    {
+        HashMap<String, Object> inputData = new HashMap<>();
 
-    // }
+        inputData.put("age", age);
+        inputData.put("job", job);
+        inputData.put("marital", marital);
+        inputData.put("education", education);
+        inputData.put("creditDefault", creditDefault);
+        inputData.put("balance", balance);
+        inputData.put("housing", housing);
+        inputData.put("loan", loan);
+        inputData.put("contact", contact);
+        inputData.put("day", day);
+        inputData.put("month", month);
+        inputData.put("campaign", campaign);
+        inputData.put("pdays", pdays);
+        inputData.put("previous", previous);
+        inputData.put("poutcome", poutcome);
+
+        try {
+            // Make the prediction
+            inputData = this.data.preprocessSingleData(inputData);
+            inputData =  this.data.knn_model.oneHotkeyEncodingForSingle(inputData);
+
+            boolean prediction = this.randomForest.randomForestPrediction(inputData);
+
+            // Return the result as a boolean based on the model's prediction
+            return prediction;  // Assuming class 1 means subscription, class 0 means no subscription
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
 
     // public void addServiceTriggered() {
 
