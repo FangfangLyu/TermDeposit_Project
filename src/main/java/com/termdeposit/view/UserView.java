@@ -35,6 +35,7 @@ public class UserView extends JFrame {
     private JPanel addServiceScreen;
 
     private ActionListener quitListener;
+    private Manager manager;
 
     // old
     // private JButton openButton;
@@ -66,13 +67,13 @@ public class UserView extends JFrame {
         this.mainScreen2 = updateMainScreen(true);
         this.trainScreen = createTrainScreen(manager);
         this.predictScreen = createPredictScreen(manager);
-        this.addServiceScreen = createAddServiceScreen(manager);
+        // this.addServiceScreen = createAddServiceScreen(manager);
 
         mainPanel.add(mainScreen1, "MainScreen1");
         mainPanel.add(mainScreen2, "MainScreen2");
         mainPanel.add(trainScreen, "TrainScreen");
         mainPanel.add(predictScreen, "PredictScreen");
-        mainPanel.add(addServiceScreen, "AddServiceScreen");
+        // mainPanel.add(addServiceScreen, "AddServiceScreen");
 
         add(mainPanel);
 
@@ -85,6 +86,7 @@ public class UserView extends JFrame {
                 System.exit(0);
             }
         };
+        setVisible(true);
 
     }
 
